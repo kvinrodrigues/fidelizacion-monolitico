@@ -1,0 +1,31 @@
+{
+  "name": "ExpirationPoint",
+  "fields": [
+    {
+      "fieldName": "validityStartDate",
+      "fieldType": "Instant",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "validityEndDate",
+      "fieldType": "Instant",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "scoreDurationDays",
+      "fieldType": "Long",
+      "fieldValidateRules": ["required"]
+    }
+  ],
+  "relationships": [],
+  "entityTableName": "expiration_point",
+  "dto": "no",
+  "pagination": "no",
+  "service": "serviceClass",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": "*",
+  "changelogDate": "20211021095423"
+}

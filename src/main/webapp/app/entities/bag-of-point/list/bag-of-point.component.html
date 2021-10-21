@@ -1,0 +1,88 @@
+<div>
+  <h2 id="page-heading" data-cy="BagOfPointHeading">
+    <span>Bag Of Points</span>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info mr-2" (click)="loadAll()" [disabled]="isLoading">
+        <fa-icon icon="sync" [spin]="isLoading"></fa-icon>
+        <span>Refresh List</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-primary jh-create-entity create-bag-of-point"
+        [routerLink]="['/bag-of-point/new']"
+      >
+        <fa-icon icon="plus"></fa-icon>
+        <span> Create a new Bag Of Point </span>
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error></jhi-alert-error>
+
+  <jhi-alert></jhi-alert>
+
+  <div class="alert alert-warning" id="no-result" *ngIf="bagOfPoints?.length === 0">
+    <span>No bagOfPoints found</span>
+  </div>
+
+  <div class="table-responsive" id="entities" *ngIf="bagOfPoints && bagOfPoints.length > 0">
+    <table class="table table-striped" aria-describedby="page-heading">
+      <thead>
+        <tr>
+          <th scope="col"><span>ID</span></th>
+          <th scope="col"><span>Asignation Date</span></th>
+          <th scope="col"><span>Expiration Date</span></th>
+          <th scope="col"><span>Assigned Score</span></th>
+          <th scope="col"><span>Score Used</span></th>
+          <th scope="col"><span>Score Balance</span></th>
+          <th scope="col"><span>Operation Amount</span></th>
+          <th scope="col"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let bagOfPoint of bagOfPoints; trackBy: trackId" data-cy="entityTable">
+          <td>
+            <a [routerLink]="['/bag-of-point', bagOfPoint.id, 'view']">{{ bagOfPoint.id }}</a>
+          </td>
+          <td>{{ bagOfPoint.asignationDate | formatMediumDatetime }}</td>
+          <td>{{ bagOfPoint.expirationDate | formatMediumDatetime }}</td>
+          <td>{{ bagOfPoint.assignedScore }}</td>
+          <td>{{ bagOfPoint.scoreUsed }}</td>
+          <td>{{ bagOfPoint.scoreBalance }}</td>
+          <td>{{ bagOfPoint.operationAmount }}</td>
+          <td class="text-right">
+            <div class="btn-group">
+              <button
+                type="submit"
+                [routerLink]="['/bag-of-point', bagOfPoint.id, 'view']"
+                class="btn btn-info btn-sm"
+                data-cy="entityDetailsButton"
+              >
+                <fa-icon icon="eye"></fa-icon>
+                <span class="d-none d-md-inline">View</span>
+              </button>
+
+              <button
+                type="submit"
+                [routerLink]="['/bag-of-point', bagOfPoint.id, 'edit']"
+                class="btn btn-primary btn-sm"
+                data-cy="entityEditButton"
+              >
+                <fa-icon icon="pencil-alt"></fa-icon>
+                <span class="d-none d-md-inline">Edit</span>
+              </button>
+
+              <button type="submit" (click)="delete(bagOfPoint)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                <fa-icon icon="times"></fa-icon>
+                <span class="d-none d-md-inline">Delete</span>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

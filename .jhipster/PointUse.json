@@ -1,0 +1,46 @@
+{
+  "name": "PointUse",
+  "fields": [
+    {
+      "fieldName": "scoreUsed",
+      "fieldType": "Long",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "eventDate",
+      "fieldType": "Instant",
+      "fieldValidateRules": ["required"]
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "client",
+      "otherEntityRelationshipName": "pointUse",
+      "relationshipName": "client",
+      "ownerSide": true
+    },
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "pointUseDet",
+      "otherEntityRelationshipName": "pointUse",
+      "relationshipName": "pointUseDetail"
+    },
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "pointUsageConcept",
+      "otherEntityRelationshipName": "pointUse",
+      "relationshipName": "pointUsageConcept"
+    }
+  ],
+  "entityTableName": "point_use",
+  "dto": "no",
+  "pagination": "no",
+  "service": "serviceClass",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": "*",
+  "changelogDate": "20211021095425"
+}

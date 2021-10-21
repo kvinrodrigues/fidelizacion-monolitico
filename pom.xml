@@ -5,22 +5,19 @@
                              https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.mycompany.myapp</groupId>
-    <artifactId>jhipster</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <groupId>com.fpuna.arqweb</groupId>
+    <artifactId>fidelizacion-mono</artifactId>
+    <version>1.0.0</version>
     <packaging>jar</packaging>
-    <name>JHipster</name>
-    <description>Description for jhipster</description>
+    <name>fidelizacion-mono</name>
+    <description>Fidelizacion Monolitico</description>
 
     <repositories>
-        <!-- jhipster-needle-maven-repository -->
     </repositories>
 
     <pluginRepositories>
-        <!-- jhipster-needle-maven-plugin-repository -->
     </pluginRepositories>
 
-    <!-- jhipster-needle-distribution-management -->
 
     <properties>
         <!-- Build properties -->

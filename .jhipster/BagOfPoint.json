@@ -1,0 +1,59 @@
+{
+  "name": "BagOfPoint",
+  "fields": [
+    {
+      "fieldName": "asignationDate",
+      "fieldType": "Instant",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "expirationDate",
+      "fieldType": "Instant",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "assignedScore",
+      "fieldType": "Long",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "scoreUsed",
+      "fieldType": "Long",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "scoreBalance",
+      "fieldType": "Long",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "operationAmount",
+      "fieldType": "Float",
+      "fieldValidateRules": ["required"]
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "client",
+      "otherEntityRelationshipName": "bagOfPoint",
+      "relationshipName": "client"
+    },
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "pointUseDet",
+      "otherEntityRelationshipName": "bagOfPoint",
+      "relationshipName": "pointUseDetail"
+    }
+  ],
+  "entityTableName": "bag_of_point",
+  "dto": "no",
+  "pagination": "no",
+  "service": "serviceClass",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": "*",
+  "changelogDate": "20211021095424"
+}

@@ -1,0 +1,44 @@
+<div class="row justify-content-center">
+  <div class="col-8">
+    <div *ngIf="pointUseDet">
+      <h2 data-cy="pointUseDetDetailsHeading"><span>Point Use Det</span></h2>
+
+      <hr />
+
+      <jhi-alert-error></jhi-alert-error>
+
+      <jhi-alert></jhi-alert>
+
+      <dl class="row-md jh-entity-details">
+        <dt><span>ID</span></dt>
+        <dd>
+          <span>{{ pointUseDet.id }}</span>
+        </dd>
+        <dt><span>Score Used</span></dt>
+        <dd>
+          <span>{{ pointUseDet.scoreUsed }}</span>
+        </dd>
+        <dt><span>Point Use</span></dt>
+        <dd>
+          <div *ngIf="pointUseDet.pointUse">
+            <a [routerLink]="['/point-use', pointUseDet.pointUse?.id, 'view']">{{ pointUseDet.pointUse?.id }}</a>
+          </div>
+        </dd>
+        <dt><span>Bag Of Point</span></dt>
+        <dd>
+          <div *ngIf="pointUseDet.bagOfPoint">
+            <a [routerLink]="['/bag-of-point', pointUseDet.bagOfPoint?.id, 'view']">{{ pointUseDet.bagOfPoint?.id }}</a>
+          </div>
+        </dd>
+      </dl>
+
+      <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+        <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span>Back</span>
+      </button>
+
+      <button type="button" [routerLink]="['/point-use-det', pointUseDet.id, 'edit']" class="btn btn-primary">
+        <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span>Edit</span>
+      </button>
+    </div>
+  </div>
+</div>

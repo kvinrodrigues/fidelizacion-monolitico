@@ -1,0 +1,31 @@
+{
+  "name": "PointUsageConcept",
+  "fields": [
+    {
+      "fieldName": "description",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "requiredPoints",
+      "fieldType": "Long"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "pointUse",
+      "otherEntityRelationshipName": "pointUsageConcept",
+      "relationshipName": "pointUse"
+    }
+  ],
+  "entityTableName": "point_usage_concept",
+  "dto": "no",
+  "pagination": "no",
+  "service": "serviceClass",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": "*",
+  "changelogDate": "20211021095421"
+}

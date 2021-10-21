@@ -1,0 +1,29 @@
+{
+  "name": "PointAllocationRule",
+  "fields": [
+    {
+      "fieldName": "lowerLimit",
+      "fieldType": "Long"
+    },
+    {
+      "fieldName": "upperLimit",
+      "fieldType": "Long"
+    },
+    {
+      "fieldName": "equivalenceOfAPoint",
+      "fieldType": "Float",
+      "fieldValidateRules": ["required"]
+    }
+  ],
+  "relationships": [],
+  "entityTableName": "point_allocation_rule",
+  "dto": "no",
+  "pagination": "no",
+  "service": "serviceClass",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": "*",
+  "changelogDate": "20211021095422"
+}

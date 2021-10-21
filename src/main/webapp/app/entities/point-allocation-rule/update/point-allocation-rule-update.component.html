@@ -1,0 +1,83 @@
+<div class="row justify-content-center">
+  <div class="col-8">
+    <form name="editForm" role="form" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2 id="jhi-point-allocation-rule-heading" data-cy="PointAllocationRuleCreateUpdateHeading">
+        Create or edit a Point Allocation Rule
+      </h2>
+
+      <div>
+        <jhi-alert-error></jhi-alert-error>
+
+        <div class="form-group" [hidden]="editForm.get('id')!.value == null">
+          <label class="form-control-label" for="field_id">ID</label>
+          <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-control-label" for="field_lowerLimit">Lower Limit</label>
+          <input
+            type="number"
+            class="form-control"
+            name="lowerLimit"
+            id="field_lowerLimit"
+            data-cy="lowerLimit"
+            formControlName="lowerLimit"
+          />
+        </div>
+
+        <div class="form-group">
+          <label class="form-control-label" for="field_upperLimit">Upper Limit</label>
+          <input
+            type="number"
+            class="form-control"
+            name="upperLimit"
+            id="field_upperLimit"
+            data-cy="upperLimit"
+            formControlName="upperLimit"
+          />
+        </div>
+
+        <div class="form-group">
+          <label class="form-control-label" for="field_equivalenceOfAPoint">Equivalence Of A Point</label>
+          <input
+            type="number"
+            class="form-control"
+            name="equivalenceOfAPoint"
+            id="field_equivalenceOfAPoint"
+            data-cy="equivalenceOfAPoint"
+            formControlName="equivalenceOfAPoint"
+          />
+          <div
+            *ngIf="
+              editForm.get('equivalenceOfAPoint')!.invalid &&
+              (editForm.get('equivalenceOfAPoint')!.dirty || editForm.get('equivalenceOfAPoint')!.touched)
+            "
+          >
+            <small class="form-text text-danger" *ngIf="editForm.get('equivalenceOfAPoint')?.errors?.required">
+              This field is required.
+            </small>
+            <small class="form-text text-danger" [hidden]="!editForm.get('equivalenceOfAPoint')?.errors?.number">
+              This field should be a number.
+            </small>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban"></fa-icon>&nbsp;<span>Cancel</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save"></fa-icon>&nbsp;<span>Save</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

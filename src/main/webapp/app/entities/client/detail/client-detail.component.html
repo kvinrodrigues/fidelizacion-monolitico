@@ -1,0 +1,70 @@
+<div class="row justify-content-center">
+  <div class="col-8">
+    <div *ngIf="client">
+      <h2 data-cy="clientDetailsHeading"><span>Client</span></h2>
+
+      <hr />
+
+      <jhi-alert-error></jhi-alert-error>
+
+      <jhi-alert></jhi-alert>
+
+      <dl class="row-md jh-entity-details">
+        <dt><span>ID</span></dt>
+        <dd>
+          <span>{{ client.id }}</span>
+        </dd>
+        <dt><span>Name</span></dt>
+        <dd>
+          <span>{{ client.name }}</span>
+        </dd>
+        <dt><span>Last Name</span></dt>
+        <dd>
+          <span>{{ client.lastName }}</span>
+        </dd>
+        <dt><span>Document Number</span></dt>
+        <dd>
+          <span>{{ client.documentNumber }}</span>
+        </dd>
+        <dt><span>Email</span></dt>
+        <dd>
+          <span>{{ client.email }}</span>
+        </dd>
+        <dt><span>Phone Number</span></dt>
+        <dd>
+          <span>{{ client.phoneNumber }}</span>
+        </dd>
+        <dt><span>Birth Date</span></dt>
+        <dd>
+          <span>{{ client.birthDate | formatMediumDatetime }}</span>
+        </dd>
+        <dt><span>Document Type</span></dt>
+        <dd>
+          <div *ngIf="client.documentType">
+            <a [routerLink]="['/document-type', client.documentType?.id, 'view']">{{ client.documentType?.id }}</a>
+          </div>
+        </dd>
+        <dt><span>Nacionality</span></dt>
+        <dd>
+          <div *ngIf="client.nacionality">
+            <a [routerLink]="['/nacionality', client.nacionality?.id, 'view']">{{ client.nacionality?.id }}</a>
+          </div>
+        </dd>
+        <dt><span>Bag Of Point</span></dt>
+        <dd>
+          <div *ngIf="client.bagOfPoint">
+            <a [routerLink]="['/bag-of-point', client.bagOfPoint?.id, 'view']">{{ client.bagOfPoint?.id }}</a>
+          </div>
+        </dd>
+      </dl>
+
+      <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+        <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span>Back</span>
+      </button>
+
+      <button type="button" [routerLink]="['/client', client.id, 'edit']" class="btn btn-primary">
+        <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span>Edit</span>
+      </button>
+    </div>
+  </div>
+</div>

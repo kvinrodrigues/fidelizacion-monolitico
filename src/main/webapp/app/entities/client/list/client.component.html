@@ -1,0 +1,96 @@
+<div>
+  <h2 id="page-heading" data-cy="ClientHeading">
+    <span>Clients</span>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info mr-2" (click)="loadAll()" [disabled]="isLoading">
+        <fa-icon icon="sync" [spin]="isLoading"></fa-icon>
+        <span>Refresh List</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-primary jh-create-entity create-client"
+        [routerLink]="['/client/new']"
+      >
+        <fa-icon icon="plus"></fa-icon>
+        <span> Create a new Client </span>
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error></jhi-alert-error>
+
+  <jhi-alert></jhi-alert>
+
+  <div class="alert alert-warning" id="no-result" *ngIf="clients?.length === 0">
+    <span>No clients found</span>
+  </div>
+
+  <div class="table-responsive" id="entities" *ngIf="clients && clients.length > 0">
+    <table class="table table-striped" aria-describedby="page-heading">
+      <thead>
+        <tr>
+          <th scope="col"><span>ID</span></th>
+          <th scope="col"><span>Name</span></th>
+          <th scope="col"><span>Last Name</span></th>
+          <th scope="col"><span>Document Number</span></th>
+          <th scope="col"><span>Email</span></th>
+          <th scope="col"><span>Phone Number</span></th>
+          <th scope="col"><span>Birth Date</span></th>
+          <th scope="col"><span>Document Type</span></th>
+          <th scope="col"><span>Nacionality</span></th>
+          <th scope="col"><span>Bag Of Point</span></th>
+          <th scope="col"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let client of clients; trackBy: trackId" data-cy="entityTable">
+          <td>
+            <a [routerLink]="['/client', client.id, 'view']">{{ client.id }}</a>
+          </td>
+          <td>{{ client.name }}</td>
+          <td>{{ client.lastName }}</td>
+          <td>{{ client.documentNumber }}</td>
+          <td>{{ client.email }}</td>
+          <td>{{ client.phoneNumber }}</td>
+          <td>{{ client.birthDate | formatMediumDatetime }}</td>
+          <td>
+            <div *ngIf="client.documentType">
+              <a [routerLink]="['/document-type', client.documentType?.id, 'view']">{{ client.documentType?.id }}</a>
+            </div>
+          </td>
+          <td>
+            <div *ngIf="client.nacionality">
+              <a [routerLink]="['/nacionality', client.nacionality?.id, 'view']">{{ client.nacionality?.id }}</a>
+            </div>
+          </td>
+          <td>
+            <div *ngIf="client.bagOfPoint">
+              <a [routerLink]="['/bag-of-point', client.bagOfPoint?.id, 'view']">{{ client.bagOfPoint?.id }}</a>
+            </div>
+          </td>
+          <td class="text-right">
+            <div class="btn-group">
+              <button type="submit" [routerLink]="['/client', client.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
+                <fa-icon icon="eye"></fa-icon>
+                <span class="d-none d-md-inline">View</span>
+              </button>
+
+              <button type="submit" [routerLink]="['/client', client.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityEditButton">
+                <fa-icon icon="pencil-alt"></fa-icon>
+                <span class="d-none d-md-inline">Edit</span>
+              </button>
+
+              <button type="submit" (click)="delete(client)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                <fa-icon icon="times"></fa-icon>
+                <span class="d-none d-md-inline">Delete</span>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

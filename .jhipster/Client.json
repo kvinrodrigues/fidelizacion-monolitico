@@ -1,0 +1,65 @@
+{
+  "name": "Client",
+  "fields": [
+    {
+      "fieldName": "name",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "lastName",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "documentNumber",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "email",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "phoneNumber",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "birthDate",
+      "fieldType": "Instant",
+      "fieldValidateRules": ["required"]
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "documentType",
+      "otherEntityRelationshipName": "client",
+      "relationshipName": "documentType"
+    },
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "nacionality",
+      "otherEntityRelationshipName": "client",
+      "relationshipName": "nacionality"
+    },
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "bagOfPoint",
+      "otherEntityRelationshipName": "client",
+      "relationshipName": "bagOfPoint"
+    }
+  ],
+  "entityTableName": "client",
+  "dto": "no",
+  "pagination": "no",
+  "service": "serviceClass",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": "*",
+  "changelogDate": "20211021095420"
+}

@@ -1,0 +1,52 @@
+<div class="row justify-content-center">
+  <div class="col-8">
+    <div *ngIf="bagOfPoint">
+      <h2 data-cy="bagOfPointDetailsHeading"><span>Bag Of Point</span></h2>
+
+      <hr />
+
+      <jhi-alert-error></jhi-alert-error>
+
+      <jhi-alert></jhi-alert>
+
+      <dl class="row-md jh-entity-details">
+        <dt><span>ID</span></dt>
+        <dd>
+          <span>{{ bagOfPoint.id }}</span>
+        </dd>
+        <dt><span>Asignation Date</span></dt>
+        <dd>
+          <span>{{ bagOfPoint.asignationDate | formatMediumDatetime }}</span>
+        </dd>
+        <dt><span>Expiration Date</span></dt>
+        <dd>
+          <span>{{ bagOfPoint.expirationDate | formatMediumDatetime }}</span>
+        </dd>
+        <dt><span>Assigned Score</span></dt>
+        <dd>
+          <span>{{ bagOfPoint.assignedScore }}</span>
+        </dd>
+        <dt><span>Score Used</span></dt>
+        <dd>
+          <span>{{ bagOfPoint.scoreUsed }}</span>
+        </dd>
+        <dt><span>Score Balance</span></dt>
+        <dd>
+          <span>{{ bagOfPoint.scoreBalance }}</span>
+        </dd>
+        <dt><span>Operation Amount</span></dt>
+        <dd>
+          <span>{{ bagOfPoint.operationAmount }}</span>
+        </dd>
+      </dl>
+
+      <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+        <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span>Back</span>
+      </button>
+
+      <button type="button" [routerLink]="['/bag-of-point', bagOfPoint.id, 'edit']" class="btn btn-primary">
+        <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span>Edit</span>
+      </button>
+    </div>
+  </div>
+</div>

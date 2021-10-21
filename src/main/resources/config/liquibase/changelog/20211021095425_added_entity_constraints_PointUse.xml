@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.5.xsd">
+    <!--
+        Added the constraints for entity PointUse.
+    -->
+    <changeSet id="20211021095425-2" author="jhipster">
+
+        <addForeignKeyConstraint baseColumnNames="client_id"
+                                 baseTableName="point_use"
+                                 constraintName="fk_point_use__client_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="client"/>
+
+        <addForeignKeyConstraint baseColumnNames="point_usage_concept_id"
+                                 baseTableName="point_use"
+                                 constraintName="fk_point_use__point_usage_concept_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="point_usage_concept"/>
+    </changeSet>
+</databaseChangeLog>

@@ -1,0 +1,34 @@
+{
+  "name": "PointUseDet",
+  "fields": [
+    {
+      "fieldName": "scoreUsed",
+      "fieldType": "Long",
+      "fieldValidateRules": ["required"]
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "pointUse",
+      "otherEntityRelationshipName": "pointUseDetail",
+      "relationshipName": "pointUse"
+    },
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "bagOfPoint",
+      "otherEntityRelationshipName": "pointUseDetail",
+      "relationshipName": "bagOfPoint"
+    }
+  ],
+  "entityTableName": "point_use_det",
+  "dto": "no",
+  "pagination": "no",
+  "service": "serviceClass",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": "*",
+  "changelogDate": "20211021095426"
+}
