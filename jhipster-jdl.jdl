@@ -1,0 +1,83 @@
+entity DocumentType {
+	name String required,
+    description String required,
+}
+
+entity Nacionality {
+	name String required,
+    description String required,
+}
+
+entity Client {
+	name String required,
+    lastName String required, 
+    documentNumber String required,
+    email String required, 
+	phoneNumber String required, 
+    birthDate Instant required 
+}
+
+entity PointUsageConcept {
+	description String,
+    requiredPoints Long
+}
+
+entity PointAllocationRule {
+	lowerLimit Long,
+    upperLimit Long,
+    equivalenceOfAPoint Float required
+}
+
+entity ExpirationPoint {
+	validityStartDate Instant required,
+    validityEndDate Instant required,
+    scoreDurationDays Long required
+}
+
+entity BagOfPoint {
+	asignationDate Instant required,
+    expirationDate Instant required, 
+    assignedScore Long required,
+    scoreUsed Long required,
+    scoreBalance Long required,
+    operationAmount Float required
+}
+
+entity PointUse {
+	scoreUsed Long required,
+    eventDate Instant required,
+}
+
+entity PointUseDet {
+	scoreUsed Long required
+}
+
+relationship OneToMany {
+	DocumentType{client} to Client
+}
+
+relationship OneToMany {
+	Nacionality{client} to Client
+}
+
+relationship OneToMany {
+	BagOfPoint{client} to Client
+}
+
+relationship OneToOne {
+	PointUse{client} to Client
+}
+
+relationship OneToMany {
+	PointUse{pointUseDetail} to PointUseDet
+}
+
+relationship OneToMany {
+	PointUsageConcept{pointUse} to PointUse
+}
+
+relationship OneToMany {
+	BagOfPoint{pointUseDetail} to PointUseDet
+}
+
+service * with serviceClass
