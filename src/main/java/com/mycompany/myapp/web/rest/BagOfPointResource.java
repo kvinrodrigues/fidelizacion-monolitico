@@ -2,7 +2,9 @@ package com.mycompany.myapp.web.rest;
 
 import com.mycompany.myapp.domain.BagOfPoint;
 import com.mycompany.myapp.repository.BagOfPointRepository;
+import com.mycompany.myapp.service.BagOfPointQueryService;
 import com.mycompany.myapp.service.BagOfPointService;
+import com.mycompany.myapp.service.criteria.BagOfPointCriteria;
 import com.mycompany.myapp.web.rest.errors.BadRequestAlertException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -37,9 +39,16 @@ public class BagOfPointResource {
 
     private final BagOfPointRepository bagOfPointRepository;
 
-    public BagOfPointResource(BagOfPointService bagOfPointService, BagOfPointRepository bagOfPointRepository) {
+    private final BagOfPointQueryService bagOfPointQueryService;
+
+    public BagOfPointResource(
+        BagOfPointService bagOfPointService,
+        BagOfPointRepository bagOfPointRepository,
+        BagOfPointQueryService bagOfPointQueryService
+    ) {
         this.bagOfPointService = bagOfPointService;
         this.bagOfPointRepository = bagOfPointRepository;
+        this.bagOfPointQueryService = bagOfPointQueryService;
     }
 
     /**
@@ -135,12 +144,26 @@ public class BagOfPointResource {
     /**
      * {@code GET  /bag-of-points} : get all the bagOfPoints.
      *
+     * @param criteria the criteria which the requested entities should match.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of bagOfPoints in body.
      */
     @GetMapping("/bag-of-points")
-    public List<BagOfPoint> getAllBagOfPoints() {
-        log.debug("REST request to get all BagOfPoints");
-        return bagOfPointService.findAll();
+    public ResponseEntity<List<BagOfPoint>> getAllBagOfPoints(BagOfPointCriteria criteria) {
+        log.debug("REST request to get BagOfPoints by criteria: {}", criteria);
+        List<BagOfPoint> entityList = bagOfPointQueryService.findByCriteria(criteria);
+        return ResponseEntity.ok().body(entityList);
+    }
+
+    /**
+     * {@code GET  /bag-of-points/count} : count all the bagOfPoints.
+     *
+     * @param criteria the criteria which the requested entities should match.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count in body.
+     */
+    @GetMapping("/bag-of-points/count")
+    public ResponseEntity<Long> countBagOfPoints(BagOfPointCriteria criteria) {
+        log.debug("REST request to count BagOfPoints by criteria: {}", criteria);
+        return ResponseEntity.ok().body(bagOfPointQueryService.countByCriteria(criteria));
     }
 
     /**

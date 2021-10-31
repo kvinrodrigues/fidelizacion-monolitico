@@ -6,8 +6,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.mycompany.myapp.IntegrationTest;
+import com.mycompany.myapp.domain.Client;
 import com.mycompany.myapp.domain.Nacionality;
 import com.mycompany.myapp.repository.NacionalityRepository;
+import com.mycompany.myapp.service.criteria.NacionalityCriteria;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
@@ -178,6 +180,245 @@ class NacionalityResourceIT {
             .andExpect(jsonPath("$.id").value(nacionality.getId().intValue()))
             .andExpect(jsonPath("$.name").value(DEFAULT_NAME))
             .andExpect(jsonPath("$.description").value(DEFAULT_DESCRIPTION));
+    }
+
+    @Test
+    @Transactional
+    void getNacionalitiesByIdFiltering() throws Exception {
+        // Initialize the database
+        nacionalityRepository.saveAndFlush(nacionality);
+
+        Long id = nacionality.getId();
+
+        defaultNacionalityShouldBeFound("id.equals=" + id);
+        defaultNacionalityShouldNotBeFound("id.notEquals=" + id);
+
+        defaultNacionalityShouldBeFound("id.greaterThanOrEqual=" + id);
+        defaultNacionalityShouldNotBeFound("id.greaterThan=" + id);
+
+        defaultNacionalityShouldBeFound("id.lessThanOrEqual=" + id);
+        defaultNacionalityShouldNotBeFound("id.lessThan=" + id);
+    }
+
+    @Test
+    @Transactional
+    void getAllNacionalitiesByNameIsEqualToSomething() throws Exception {
+        // Initialize the database
+        nacionalityRepository.saveAndFlush(nacionality);
+
+        // Get all the nacionalityList where name equals to DEFAULT_NAME
+        defaultNacionalityShouldBeFound("name.equals=" + DEFAULT_NAME);
+
+        // Get all the nacionalityList where name equals to UPDATED_NAME
+        defaultNacionalityShouldNotBeFound("name.equals=" + UPDATED_NAME);
+    }
+
+    @Test
+    @Transactional
+    void getAllNacionalitiesByNameIsNotEqualToSomething() throws Exception {
+        // Initialize the database
+        nacionalityRepository.saveAndFlush(nacionality);
+
+        // Get all the nacionalityList where name not equals to DEFAULT_NAME
+        defaultNacionalityShouldNotBeFound("name.notEquals=" + DEFAULT_NAME);
+
+        // Get all the nacionalityList where name not equals to UPDATED_NAME
+        defaultNacionalityShouldBeFound("name.notEquals=" + UPDATED_NAME);
+    }
+
+    @Test
+    @Transactional
+    void getAllNacionalitiesByNameIsInShouldWork() throws Exception {
+        // Initialize the database
+        nacionalityRepository.saveAndFlush(nacionality);
+
+        // Get all the nacionalityList where name in DEFAULT_NAME or UPDATED_NAME
+        defaultNacionalityShouldBeFound("name.in=" + DEFAULT_NAME + "," + UPDATED_NAME);
+
+        // Get all the nacionalityList where name equals to UPDATED_NAME
+        defaultNacionalityShouldNotBeFound("name.in=" + UPDATED_NAME);
+    }
+
+    @Test
+    @Transactional
+    void getAllNacionalitiesByNameIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        nacionalityRepository.saveAndFlush(nacionality);
+
+        // Get all the nacionalityList where name is not null
+        defaultNacionalityShouldBeFound("name.specified=true");
+
+        // Get all the nacionalityList where name is null
+        defaultNacionalityShouldNotBeFound("name.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllNacionalitiesByNameContainsSomething() throws Exception {
+        // Initialize the database
+        nacionalityRepository.saveAndFlush(nacionality);
+
+        // Get all the nacionalityList where name contains DEFAULT_NAME
+        defaultNacionalityShouldBeFound("name.contains=" + DEFAULT_NAME);
+
+        // Get all the nacionalityList where name contains UPDATED_NAME
+        defaultNacionalityShouldNotBeFound("name.contains=" + UPDATED_NAME);
+    }
+
+    @Test
+    @Transactional
+    void getAllNacionalitiesByNameNotContainsSomething() throws Exception {
+        // Initialize the database
+        nacionalityRepository.saveAndFlush(nacionality);
+
+        // Get all the nacionalityList where name does not contain DEFAULT_NAME
+        defaultNacionalityShouldNotBeFound("name.doesNotContain=" + DEFAULT_NAME);
+
+        // Get all the nacionalityList where name does not contain UPDATED_NAME
+        defaultNacionalityShouldBeFound("name.doesNotContain=" + UPDATED_NAME);
+    }
+
+    @Test
+    @Transactional
+    void getAllNacionalitiesByDescriptionIsEqualToSomething() throws Exception {
+        // Initialize the database
+        nacionalityRepository.saveAndFlush(nacionality);
+
+        // Get all the nacionalityList where description equals to DEFAULT_DESCRIPTION
+        defaultNacionalityShouldBeFound("description.equals=" + DEFAULT_DESCRIPTION);
+
+        // Get all the nacionalityList where description equals to UPDATED_DESCRIPTION
+        defaultNacionalityShouldNotBeFound("description.equals=" + UPDATED_DESCRIPTION);
+    }
+
+    @Test
+    @Transactional
+    void getAllNacionalitiesByDescriptionIsNotEqualToSomething() throws Exception {
+        // Initialize the database
+        nacionalityRepository.saveAndFlush(nacionality);
+
+        // Get all the nacionalityList where description not equals to DEFAULT_DESCRIPTION
+        defaultNacionalityShouldNotBeFound("description.notEquals=" + DEFAULT_DESCRIPTION);
+
+        // Get all the nacionalityList where description not equals to UPDATED_DESCRIPTION
+        defaultNacionalityShouldBeFound("description.notEquals=" + UPDATED_DESCRIPTION);
+    }
+
+    @Test
+    @Transactional
+    void getAllNacionalitiesByDescriptionIsInShouldWork() throws Exception {
+        // Initialize the database
+        nacionalityRepository.saveAndFlush(nacionality);
+
+        // Get all the nacionalityList where description in DEFAULT_DESCRIPTION or UPDATED_DESCRIPTION
+        defaultNacionalityShouldBeFound("description.in=" + DEFAULT_DESCRIPTION + "," + UPDATED_DESCRIPTION);
+
+        // Get all the nacionalityList where description equals to UPDATED_DESCRIPTION
+        defaultNacionalityShouldNotBeFound("description.in=" + UPDATED_DESCRIPTION);
+    }
+
+    @Test
+    @Transactional
+    void getAllNacionalitiesByDescriptionIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        nacionalityRepository.saveAndFlush(nacionality);
+
+        // Get all the nacionalityList where description is not null
+        defaultNacionalityShouldBeFound("description.specified=true");
+
+        // Get all the nacionalityList where description is null
+        defaultNacionalityShouldNotBeFound("description.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllNacionalitiesByDescriptionContainsSomething() throws Exception {
+        // Initialize the database
+        nacionalityRepository.saveAndFlush(nacionality);
+
+        // Get all the nacionalityList where description contains DEFAULT_DESCRIPTION
+        defaultNacionalityShouldBeFound("description.contains=" + DEFAULT_DESCRIPTION);
+
+        // Get all the nacionalityList where description contains UPDATED_DESCRIPTION
+        defaultNacionalityShouldNotBeFound("description.contains=" + UPDATED_DESCRIPTION);
+    }
+
+    @Test
+    @Transactional
+    void getAllNacionalitiesByDescriptionNotContainsSomething() throws Exception {
+        // Initialize the database
+        nacionalityRepository.saveAndFlush(nacionality);
+
+        // Get all the nacionalityList where description does not contain DEFAULT_DESCRIPTION
+        defaultNacionalityShouldNotBeFound("description.doesNotContain=" + DEFAULT_DESCRIPTION);
+
+        // Get all the nacionalityList where description does not contain UPDATED_DESCRIPTION
+        defaultNacionalityShouldBeFound("description.doesNotContain=" + UPDATED_DESCRIPTION);
+    }
+
+    @Test
+    @Transactional
+    void getAllNacionalitiesByClientIsEqualToSomething() throws Exception {
+        // Initialize the database
+        nacionalityRepository.saveAndFlush(nacionality);
+        Client client;
+        if (TestUtil.findAll(em, Client.class).isEmpty()) {
+            client = ClientResourceIT.createEntity(em);
+            em.persist(client);
+            em.flush();
+        } else {
+            client = TestUtil.findAll(em, Client.class).get(0);
+        }
+        em.persist(client);
+        em.flush();
+        nacionality.addClient(client);
+        nacionalityRepository.saveAndFlush(nacionality);
+        Long clientId = client.getId();
+
+        // Get all the nacionalityList where client equals to clientId
+        defaultNacionalityShouldBeFound("clientId.equals=" + clientId);
+
+        // Get all the nacionalityList where client equals to (clientId + 1)
+        defaultNacionalityShouldNotBeFound("clientId.equals=" + (clientId + 1));
+    }
+
+    /**
+     * Executes the search, and checks that the default entity is returned.
+     */
+    private void defaultNacionalityShouldBeFound(String filter) throws Exception {
+        restNacionalityMockMvc
+            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(jsonPath("$.[*].id").value(hasItem(nacionality.getId().intValue())))
+            .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
+            .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION)));
+
+        // Check, that the count call also returns 1
+        restNacionalityMockMvc
+            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(content().string("1"));
+    }
+
+    /**
+     * Executes the search, and checks that the default entity is not returned.
+     */
+    private void defaultNacionalityShouldNotBeFound(String filter) throws Exception {
+        restNacionalityMockMvc
+            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(jsonPath("$").isArray())
+            .andExpect(jsonPath("$").isEmpty());
+
+        // Check, that the count call also returns 0
+        restNacionalityMockMvc
+            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(content().string("0"));
     }
 
     @Test

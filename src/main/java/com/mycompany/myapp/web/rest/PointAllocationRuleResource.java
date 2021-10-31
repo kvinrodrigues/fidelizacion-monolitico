@@ -2,7 +2,9 @@ package com.mycompany.myapp.web.rest;
 
 import com.mycompany.myapp.domain.PointAllocationRule;
 import com.mycompany.myapp.repository.PointAllocationRuleRepository;
+import com.mycompany.myapp.service.PointAllocationRuleQueryService;
 import com.mycompany.myapp.service.PointAllocationRuleService;
+import com.mycompany.myapp.service.criteria.PointAllocationRuleCriteria;
 import com.mycompany.myapp.web.rest.errors.BadRequestAlertException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -37,12 +39,16 @@ public class PointAllocationRuleResource {
 
     private final PointAllocationRuleRepository pointAllocationRuleRepository;
 
+    private final PointAllocationRuleQueryService pointAllocationRuleQueryService;
+
     public PointAllocationRuleResource(
         PointAllocationRuleService pointAllocationRuleService,
-        PointAllocationRuleRepository pointAllocationRuleRepository
+        PointAllocationRuleRepository pointAllocationRuleRepository,
+        PointAllocationRuleQueryService pointAllocationRuleQueryService
     ) {
         this.pointAllocationRuleService = pointAllocationRuleService;
         this.pointAllocationRuleRepository = pointAllocationRuleRepository;
+        this.pointAllocationRuleQueryService = pointAllocationRuleQueryService;
     }
 
     /**
@@ -139,12 +145,26 @@ public class PointAllocationRuleResource {
     /**
      * {@code GET  /point-allocation-rules} : get all the pointAllocationRules.
      *
+     * @param criteria the criteria which the requested entities should match.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of pointAllocationRules in body.
      */
     @GetMapping("/point-allocation-rules")
-    public List<PointAllocationRule> getAllPointAllocationRules() {
-        log.debug("REST request to get all PointAllocationRules");
-        return pointAllocationRuleService.findAll();
+    public ResponseEntity<List<PointAllocationRule>> getAllPointAllocationRules(PointAllocationRuleCriteria criteria) {
+        log.debug("REST request to get PointAllocationRules by criteria: {}", criteria);
+        List<PointAllocationRule> entityList = pointAllocationRuleQueryService.findByCriteria(criteria);
+        return ResponseEntity.ok().body(entityList);
+    }
+
+    /**
+     * {@code GET  /point-allocation-rules/count} : count all the pointAllocationRules.
+     *
+     * @param criteria the criteria which the requested entities should match.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count in body.
+     */
+    @GetMapping("/point-allocation-rules/count")
+    public ResponseEntity<Long> countPointAllocationRules(PointAllocationRuleCriteria criteria) {
+        log.debug("REST request to count PointAllocationRules by criteria: {}", criteria);
+        return ResponseEntity.ok().body(pointAllocationRuleQueryService.countByCriteria(criteria));
     }
 
     /**

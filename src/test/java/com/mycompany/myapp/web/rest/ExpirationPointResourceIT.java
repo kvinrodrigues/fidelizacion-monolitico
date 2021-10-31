@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.mycompany.myapp.IntegrationTest;
 import com.mycompany.myapp.domain.ExpirationPoint;
 import com.mycompany.myapp.repository.ExpirationPointRepository;
+import com.mycompany.myapp.service.criteria.ExpirationPointCriteria;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -39,6 +40,7 @@ class ExpirationPointResourceIT {
 
     private static final Long DEFAULT_SCORE_DURATION_DAYS = 1L;
     private static final Long UPDATED_SCORE_DURATION_DAYS = 2L;
+    private static final Long SMALLER_SCORE_DURATION_DAYS = 1L - 1L;
 
     private static final String ENTITY_API_URL = "/api/expiration-points";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
@@ -219,6 +221,272 @@ class ExpirationPointResourceIT {
             .andExpect(jsonPath("$.validityStartDate").value(DEFAULT_VALIDITY_START_DATE.toString()))
             .andExpect(jsonPath("$.validityEndDate").value(DEFAULT_VALIDITY_END_DATE.toString()))
             .andExpect(jsonPath("$.scoreDurationDays").value(DEFAULT_SCORE_DURATION_DAYS.intValue()));
+    }
+
+    @Test
+    @Transactional
+    void getExpirationPointsByIdFiltering() throws Exception {
+        // Initialize the database
+        expirationPointRepository.saveAndFlush(expirationPoint);
+
+        Long id = expirationPoint.getId();
+
+        defaultExpirationPointShouldBeFound("id.equals=" + id);
+        defaultExpirationPointShouldNotBeFound("id.notEquals=" + id);
+
+        defaultExpirationPointShouldBeFound("id.greaterThanOrEqual=" + id);
+        defaultExpirationPointShouldNotBeFound("id.greaterThan=" + id);
+
+        defaultExpirationPointShouldBeFound("id.lessThanOrEqual=" + id);
+        defaultExpirationPointShouldNotBeFound("id.lessThan=" + id);
+    }
+
+    @Test
+    @Transactional
+    void getAllExpirationPointsByValidityStartDateIsEqualToSomething() throws Exception {
+        // Initialize the database
+        expirationPointRepository.saveAndFlush(expirationPoint);
+
+        // Get all the expirationPointList where validityStartDate equals to DEFAULT_VALIDITY_START_DATE
+        defaultExpirationPointShouldBeFound("validityStartDate.equals=" + DEFAULT_VALIDITY_START_DATE);
+
+        // Get all the expirationPointList where validityStartDate equals to UPDATED_VALIDITY_START_DATE
+        defaultExpirationPointShouldNotBeFound("validityStartDate.equals=" + UPDATED_VALIDITY_START_DATE);
+    }
+
+    @Test
+    @Transactional
+    void getAllExpirationPointsByValidityStartDateIsNotEqualToSomething() throws Exception {
+        // Initialize the database
+        expirationPointRepository.saveAndFlush(expirationPoint);
+
+        // Get all the expirationPointList where validityStartDate not equals to DEFAULT_VALIDITY_START_DATE
+        defaultExpirationPointShouldNotBeFound("validityStartDate.notEquals=" + DEFAULT_VALIDITY_START_DATE);
+
+        // Get all the expirationPointList where validityStartDate not equals to UPDATED_VALIDITY_START_DATE
+        defaultExpirationPointShouldBeFound("validityStartDate.notEquals=" + UPDATED_VALIDITY_START_DATE);
+    }
+
+    @Test
+    @Transactional
+    void getAllExpirationPointsByValidityStartDateIsInShouldWork() throws Exception {
+        // Initialize the database
+        expirationPointRepository.saveAndFlush(expirationPoint);
+
+        // Get all the expirationPointList where validityStartDate in DEFAULT_VALIDITY_START_DATE or UPDATED_VALIDITY_START_DATE
+        defaultExpirationPointShouldBeFound("validityStartDate.in=" + DEFAULT_VALIDITY_START_DATE + "," + UPDATED_VALIDITY_START_DATE);
+
+        // Get all the expirationPointList where validityStartDate equals to UPDATED_VALIDITY_START_DATE
+        defaultExpirationPointShouldNotBeFound("validityStartDate.in=" + UPDATED_VALIDITY_START_DATE);
+    }
+
+    @Test
+    @Transactional
+    void getAllExpirationPointsByValidityStartDateIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        expirationPointRepository.saveAndFlush(expirationPoint);
+
+        // Get all the expirationPointList where validityStartDate is not null
+        defaultExpirationPointShouldBeFound("validityStartDate.specified=true");
+
+        // Get all the expirationPointList where validityStartDate is null
+        defaultExpirationPointShouldNotBeFound("validityStartDate.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllExpirationPointsByValidityEndDateIsEqualToSomething() throws Exception {
+        // Initialize the database
+        expirationPointRepository.saveAndFlush(expirationPoint);
+
+        // Get all the expirationPointList where validityEndDate equals to DEFAULT_VALIDITY_END_DATE
+        defaultExpirationPointShouldBeFound("validityEndDate.equals=" + DEFAULT_VALIDITY_END_DATE);
+
+        // Get all the expirationPointList where validityEndDate equals to UPDATED_VALIDITY_END_DATE
+        defaultExpirationPointShouldNotBeFound("validityEndDate.equals=" + UPDATED_VALIDITY_END_DATE);
+    }
+
+    @Test
+    @Transactional
+    void getAllExpirationPointsByValidityEndDateIsNotEqualToSomething() throws Exception {
+        // Initialize the database
+        expirationPointRepository.saveAndFlush(expirationPoint);
+
+        // Get all the expirationPointList where validityEndDate not equals to DEFAULT_VALIDITY_END_DATE
+        defaultExpirationPointShouldNotBeFound("validityEndDate.notEquals=" + DEFAULT_VALIDITY_END_DATE);
+
+        // Get all the expirationPointList where validityEndDate not equals to UPDATED_VALIDITY_END_DATE
+        defaultExpirationPointShouldBeFound("validityEndDate.notEquals=" + UPDATED_VALIDITY_END_DATE);
+    }
+
+    @Test
+    @Transactional
+    void getAllExpirationPointsByValidityEndDateIsInShouldWork() throws Exception {
+        // Initialize the database
+        expirationPointRepository.saveAndFlush(expirationPoint);
+
+        // Get all the expirationPointList where validityEndDate in DEFAULT_VALIDITY_END_DATE or UPDATED_VALIDITY_END_DATE
+        defaultExpirationPointShouldBeFound("validityEndDate.in=" + DEFAULT_VALIDITY_END_DATE + "," + UPDATED_VALIDITY_END_DATE);
+
+        // Get all the expirationPointList where validityEndDate equals to UPDATED_VALIDITY_END_DATE
+        defaultExpirationPointShouldNotBeFound("validityEndDate.in=" + UPDATED_VALIDITY_END_DATE);
+    }
+
+    @Test
+    @Transactional
+    void getAllExpirationPointsByValidityEndDateIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        expirationPointRepository.saveAndFlush(expirationPoint);
+
+        // Get all the expirationPointList where validityEndDate is not null
+        defaultExpirationPointShouldBeFound("validityEndDate.specified=true");
+
+        // Get all the expirationPointList where validityEndDate is null
+        defaultExpirationPointShouldNotBeFound("validityEndDate.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllExpirationPointsByScoreDurationDaysIsEqualToSomething() throws Exception {
+        // Initialize the database
+        expirationPointRepository.saveAndFlush(expirationPoint);
+
+        // Get all the expirationPointList where scoreDurationDays equals to DEFAULT_SCORE_DURATION_DAYS
+        defaultExpirationPointShouldBeFound("scoreDurationDays.equals=" + DEFAULT_SCORE_DURATION_DAYS);
+
+        // Get all the expirationPointList where scoreDurationDays equals to UPDATED_SCORE_DURATION_DAYS
+        defaultExpirationPointShouldNotBeFound("scoreDurationDays.equals=" + UPDATED_SCORE_DURATION_DAYS);
+    }
+
+    @Test
+    @Transactional
+    void getAllExpirationPointsByScoreDurationDaysIsNotEqualToSomething() throws Exception {
+        // Initialize the database
+        expirationPointRepository.saveAndFlush(expirationPoint);
+
+        // Get all the expirationPointList where scoreDurationDays not equals to DEFAULT_SCORE_DURATION_DAYS
+        defaultExpirationPointShouldNotBeFound("scoreDurationDays.notEquals=" + DEFAULT_SCORE_DURATION_DAYS);
+
+        // Get all the expirationPointList where scoreDurationDays not equals to UPDATED_SCORE_DURATION_DAYS
+        defaultExpirationPointShouldBeFound("scoreDurationDays.notEquals=" + UPDATED_SCORE_DURATION_DAYS);
+    }
+
+    @Test
+    @Transactional
+    void getAllExpirationPointsByScoreDurationDaysIsInShouldWork() throws Exception {
+        // Initialize the database
+        expirationPointRepository.saveAndFlush(expirationPoint);
+
+        // Get all the expirationPointList where scoreDurationDays in DEFAULT_SCORE_DURATION_DAYS or UPDATED_SCORE_DURATION_DAYS
+        defaultExpirationPointShouldBeFound("scoreDurationDays.in=" + DEFAULT_SCORE_DURATION_DAYS + "," + UPDATED_SCORE_DURATION_DAYS);
+
+        // Get all the expirationPointList where scoreDurationDays equals to UPDATED_SCORE_DURATION_DAYS
+        defaultExpirationPointShouldNotBeFound("scoreDurationDays.in=" + UPDATED_SCORE_DURATION_DAYS);
+    }
+
+    @Test
+    @Transactional
+    void getAllExpirationPointsByScoreDurationDaysIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        expirationPointRepository.saveAndFlush(expirationPoint);
+
+        // Get all the expirationPointList where scoreDurationDays is not null
+        defaultExpirationPointShouldBeFound("scoreDurationDays.specified=true");
+
+        // Get all the expirationPointList where scoreDurationDays is null
+        defaultExpirationPointShouldNotBeFound("scoreDurationDays.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllExpirationPointsByScoreDurationDaysIsGreaterThanOrEqualToSomething() throws Exception {
+        // Initialize the database
+        expirationPointRepository.saveAndFlush(expirationPoint);
+
+        // Get all the expirationPointList where scoreDurationDays is greater than or equal to DEFAULT_SCORE_DURATION_DAYS
+        defaultExpirationPointShouldBeFound("scoreDurationDays.greaterThanOrEqual=" + DEFAULT_SCORE_DURATION_DAYS);
+
+        // Get all the expirationPointList where scoreDurationDays is greater than or equal to UPDATED_SCORE_DURATION_DAYS
+        defaultExpirationPointShouldNotBeFound("scoreDurationDays.greaterThanOrEqual=" + UPDATED_SCORE_DURATION_DAYS);
+    }
+
+    @Test
+    @Transactional
+    void getAllExpirationPointsByScoreDurationDaysIsLessThanOrEqualToSomething() throws Exception {
+        // Initialize the database
+        expirationPointRepository.saveAndFlush(expirationPoint);
+
+        // Get all the expirationPointList where scoreDurationDays is less than or equal to DEFAULT_SCORE_DURATION_DAYS
+        defaultExpirationPointShouldBeFound("scoreDurationDays.lessThanOrEqual=" + DEFAULT_SCORE_DURATION_DAYS);
+
+        // Get all the expirationPointList where scoreDurationDays is less than or equal to SMALLER_SCORE_DURATION_DAYS
+        defaultExpirationPointShouldNotBeFound("scoreDurationDays.lessThanOrEqual=" + SMALLER_SCORE_DURATION_DAYS);
+    }
+
+    @Test
+    @Transactional
+    void getAllExpirationPointsByScoreDurationDaysIsLessThanSomething() throws Exception {
+        // Initialize the database
+        expirationPointRepository.saveAndFlush(expirationPoint);
+
+        // Get all the expirationPointList where scoreDurationDays is less than DEFAULT_SCORE_DURATION_DAYS
+        defaultExpirationPointShouldNotBeFound("scoreDurationDays.lessThan=" + DEFAULT_SCORE_DURATION_DAYS);
+
+        // Get all the expirationPointList where scoreDurationDays is less than UPDATED_SCORE_DURATION_DAYS
+        defaultExpirationPointShouldBeFound("scoreDurationDays.lessThan=" + UPDATED_SCORE_DURATION_DAYS);
+    }
+
+    @Test
+    @Transactional
+    void getAllExpirationPointsByScoreDurationDaysIsGreaterThanSomething() throws Exception {
+        // Initialize the database
+        expirationPointRepository.saveAndFlush(expirationPoint);
+
+        // Get all the expirationPointList where scoreDurationDays is greater than DEFAULT_SCORE_DURATION_DAYS
+        defaultExpirationPointShouldNotBeFound("scoreDurationDays.greaterThan=" + DEFAULT_SCORE_DURATION_DAYS);
+
+        // Get all the expirationPointList where scoreDurationDays is greater than SMALLER_SCORE_DURATION_DAYS
+        defaultExpirationPointShouldBeFound("scoreDurationDays.greaterThan=" + SMALLER_SCORE_DURATION_DAYS);
+    }
+
+    /**
+     * Executes the search, and checks that the default entity is returned.
+     */
+    private void defaultExpirationPointShouldBeFound(String filter) throws Exception {
+        restExpirationPointMockMvc
+            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(jsonPath("$.[*].id").value(hasItem(expirationPoint.getId().intValue())))
+            .andExpect(jsonPath("$.[*].validityStartDate").value(hasItem(DEFAULT_VALIDITY_START_DATE.toString())))
+            .andExpect(jsonPath("$.[*].validityEndDate").value(hasItem(DEFAULT_VALIDITY_END_DATE.toString())))
+            .andExpect(jsonPath("$.[*].scoreDurationDays").value(hasItem(DEFAULT_SCORE_DURATION_DAYS.intValue())));
+
+        // Check, that the count call also returns 1
+        restExpirationPointMockMvc
+            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(content().string("1"));
+    }
+
+    /**
+     * Executes the search, and checks that the default entity is not returned.
+     */
+    private void defaultExpirationPointShouldNotBeFound(String filter) throws Exception {
+        restExpirationPointMockMvc
+            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(jsonPath("$").isArray())
+            .andExpect(jsonPath("$").isEmpty());
+
+        // Check, that the count call also returns 0
+        restExpirationPointMockMvc
+            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(content().string("0"));
     }
 
     @Test

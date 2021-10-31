@@ -9,4 +9,5 @@ import org.springframework.stereotype.Repository;
  */
 @SuppressWarnings("unused")
 @Repository
-public interface PointAllocationRuleRepository extends JpaRepository<PointAllocationRule, Long> {}
+public interface PointAllocationRuleRepository
+    extends JpaRepository<PointAllocationRule, Long>, JpaSpecificationExecutor<PointAllocationRule> {}

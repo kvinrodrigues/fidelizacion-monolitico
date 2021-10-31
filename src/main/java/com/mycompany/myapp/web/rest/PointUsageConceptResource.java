@@ -2,7 +2,9 @@ package com.mycompany.myapp.web.rest;
 
 import com.mycompany.myapp.domain.PointUsageConcept;
 import com.mycompany.myapp.repository.PointUsageConceptRepository;
+import com.mycompany.myapp.service.PointUsageConceptQueryService;
 import com.mycompany.myapp.service.PointUsageConceptService;
+import com.mycompany.myapp.service.criteria.PointUsageConceptCriteria;
 import com.mycompany.myapp.web.rest.errors.BadRequestAlertException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -35,12 +37,16 @@ public class PointUsageConceptResource {
 
     private final PointUsageConceptRepository pointUsageConceptRepository;
 
+    private final PointUsageConceptQueryService pointUsageConceptQueryService;
+
     public PointUsageConceptResource(
         PointUsageConceptService pointUsageConceptService,
-        PointUsageConceptRepository pointUsageConceptRepository
+        PointUsageConceptRepository pointUsageConceptRepository,
+        PointUsageConceptQueryService pointUsageConceptQueryService
     ) {
         this.pointUsageConceptService = pointUsageConceptService;
         this.pointUsageConceptRepository = pointUsageConceptRepository;
+        this.pointUsageConceptQueryService = pointUsageConceptQueryService;
     }
 
     /**
@@ -137,12 +143,26 @@ public class PointUsageConceptResource {
     /**
      * {@code GET  /point-usage-concepts} : get all the pointUsageConcepts.
      *
+     * @param criteria the criteria which the requested entities should match.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of pointUsageConcepts in body.
      */
     @GetMapping("/point-usage-concepts")
-    public List<PointUsageConcept> getAllPointUsageConcepts() {
-        log.debug("REST request to get all PointUsageConcepts");
-        return pointUsageConceptService.findAll();
+    public ResponseEntity<List<PointUsageConcept>> getAllPointUsageConcepts(PointUsageConceptCriteria criteria) {
+        log.debug("REST request to get PointUsageConcepts by criteria: {}", criteria);
+        List<PointUsageConcept> entityList = pointUsageConceptQueryService.findByCriteria(criteria);
+        return ResponseEntity.ok().body(entityList);
+    }
+
+    /**
+     * {@code GET  /point-usage-concepts/count} : count all the pointUsageConcepts.
+     *
+     * @param criteria the criteria which the requested entities should match.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count in body.
+     */
+    @GetMapping("/point-usage-concepts/count")
+    public ResponseEntity<Long> countPointUsageConcepts(PointUsageConceptCriteria criteria) {
+        log.debug("REST request to count PointUsageConcepts by criteria: {}", criteria);
+        return ResponseEntity.ok().body(pointUsageConceptQueryService.countByCriteria(criteria));
     }
 
     /**

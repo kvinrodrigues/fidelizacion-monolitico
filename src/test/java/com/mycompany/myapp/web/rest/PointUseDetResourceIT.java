@@ -6,8 +6,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.mycompany.myapp.IntegrationTest;
+import com.mycompany.myapp.domain.BagOfPoint;
+import com.mycompany.myapp.domain.PointUse;
 import com.mycompany.myapp.domain.PointUseDet;
 import com.mycompany.myapp.repository.PointUseDetRepository;
+import com.mycompany.myapp.service.criteria.PointUseDetCriteria;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
@@ -31,6 +34,7 @@ class PointUseDetResourceIT {
 
     private static final Long DEFAULT_SCORE_USED = 1L;
     private static final Long UPDATED_SCORE_USED = 2L;
+    private static final Long SMALLER_SCORE_USED = 1L - 1L;
 
     private static final String ENTITY_API_URL = "/api/point-use-dets";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
@@ -155,6 +159,218 @@ class PointUseDetResourceIT {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(pointUseDet.getId().intValue()))
             .andExpect(jsonPath("$.scoreUsed").value(DEFAULT_SCORE_USED.intValue()));
+    }
+
+    @Test
+    @Transactional
+    void getPointUseDetsByIdFiltering() throws Exception {
+        // Initialize the database
+        pointUseDetRepository.saveAndFlush(pointUseDet);
+
+        Long id = pointUseDet.getId();
+
+        defaultPointUseDetShouldBeFound("id.equals=" + id);
+        defaultPointUseDetShouldNotBeFound("id.notEquals=" + id);
+
+        defaultPointUseDetShouldBeFound("id.greaterThanOrEqual=" + id);
+        defaultPointUseDetShouldNotBeFound("id.greaterThan=" + id);
+
+        defaultPointUseDetShouldBeFound("id.lessThanOrEqual=" + id);
+        defaultPointUseDetShouldNotBeFound("id.lessThan=" + id);
+    }
+
+    @Test
+    @Transactional
+    void getAllPointUseDetsByScoreUsedIsEqualToSomething() throws Exception {
+        // Initialize the database
+        pointUseDetRepository.saveAndFlush(pointUseDet);
+
+        // Get all the pointUseDetList where scoreUsed equals to DEFAULT_SCORE_USED
+        defaultPointUseDetShouldBeFound("scoreUsed.equals=" + DEFAULT_SCORE_USED);
+
+        // Get all the pointUseDetList where scoreUsed equals to UPDATED_SCORE_USED
+        defaultPointUseDetShouldNotBeFound("scoreUsed.equals=" + UPDATED_SCORE_USED);
+    }
+
+    @Test
+    @Transactional
+    void getAllPointUseDetsByScoreUsedIsNotEqualToSomething() throws Exception {
+        // Initialize the database
+        pointUseDetRepository.saveAndFlush(pointUseDet);
+
+        // Get all the pointUseDetList where scoreUsed not equals to DEFAULT_SCORE_USED
+        defaultPointUseDetShouldNotBeFound("scoreUsed.notEquals=" + DEFAULT_SCORE_USED);
+
+        // Get all the pointUseDetList where scoreUsed not equals to UPDATED_SCORE_USED
+        defaultPointUseDetShouldBeFound("scoreUsed.notEquals=" + UPDATED_SCORE_USED);
+    }
+
+    @Test
+    @Transactional
+    void getAllPointUseDetsByScoreUsedIsInShouldWork() throws Exception {
+        // Initialize the database
+        pointUseDetRepository.saveAndFlush(pointUseDet);
+
+        // Get all the pointUseDetList where scoreUsed in DEFAULT_SCORE_USED or UPDATED_SCORE_USED
+        defaultPointUseDetShouldBeFound("scoreUsed.in=" + DEFAULT_SCORE_USED + "," + UPDATED_SCORE_USED);
+
+        // Get all the pointUseDetList where scoreUsed equals to UPDATED_SCORE_USED
+        defaultPointUseDetShouldNotBeFound("scoreUsed.in=" + UPDATED_SCORE_USED);
+    }
+
+    @Test
+    @Transactional
+    void getAllPointUseDetsByScoreUsedIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        pointUseDetRepository.saveAndFlush(pointUseDet);
+
+        // Get all the pointUseDetList where scoreUsed is not null
+        defaultPointUseDetShouldBeFound("scoreUsed.specified=true");
+
+        // Get all the pointUseDetList where scoreUsed is null
+        defaultPointUseDetShouldNotBeFound("scoreUsed.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllPointUseDetsByScoreUsedIsGreaterThanOrEqualToSomething() throws Exception {
+        // Initialize the database
+        pointUseDetRepository.saveAndFlush(pointUseDet);
+
+        // Get all the pointUseDetList where scoreUsed is greater than or equal to DEFAULT_SCORE_USED
+        defaultPointUseDetShouldBeFound("scoreUsed.greaterThanOrEqual=" + DEFAULT_SCORE_USED);
+
+        // Get all the pointUseDetList where scoreUsed is greater than or equal to UPDATED_SCORE_USED
+        defaultPointUseDetShouldNotBeFound("scoreUsed.greaterThanOrEqual=" + UPDATED_SCORE_USED);
+    }
+
+    @Test
+    @Transactional
+    void getAllPointUseDetsByScoreUsedIsLessThanOrEqualToSomething() throws Exception {
+        // Initialize the database
+        pointUseDetRepository.saveAndFlush(pointUseDet);
+
+        // Get all the pointUseDetList where scoreUsed is less than or equal to DEFAULT_SCORE_USED
+        defaultPointUseDetShouldBeFound("scoreUsed.lessThanOrEqual=" + DEFAULT_SCORE_USED);
+
+        // Get all the pointUseDetList where scoreUsed is less than or equal to SMALLER_SCORE_USED
+        defaultPointUseDetShouldNotBeFound("scoreUsed.lessThanOrEqual=" + SMALLER_SCORE_USED);
+    }
+
+    @Test
+    @Transactional
+    void getAllPointUseDetsByScoreUsedIsLessThanSomething() throws Exception {
+        // Initialize the database
+        pointUseDetRepository.saveAndFlush(pointUseDet);
+
+        // Get all the pointUseDetList where scoreUsed is less than DEFAULT_SCORE_USED
+        defaultPointUseDetShouldNotBeFound("scoreUsed.lessThan=" + DEFAULT_SCORE_USED);
+
+        // Get all the pointUseDetList where scoreUsed is less than UPDATED_SCORE_USED
+        defaultPointUseDetShouldBeFound("scoreUsed.lessThan=" + UPDATED_SCORE_USED);
+    }
+
+    @Test
+    @Transactional
+    void getAllPointUseDetsByScoreUsedIsGreaterThanSomething() throws Exception {
+        // Initialize the database
+        pointUseDetRepository.saveAndFlush(pointUseDet);
+
+        // Get all the pointUseDetList where scoreUsed is greater than DEFAULT_SCORE_USED
+        defaultPointUseDetShouldNotBeFound("scoreUsed.greaterThan=" + DEFAULT_SCORE_USED);
+
+        // Get all the pointUseDetList where scoreUsed is greater than SMALLER_SCORE_USED
+        defaultPointUseDetShouldBeFound("scoreUsed.greaterThan=" + SMALLER_SCORE_USED);
+    }
+
+    @Test
+    @Transactional
+    void getAllPointUseDetsByPointUseIsEqualToSomething() throws Exception {
+        // Initialize the database
+        pointUseDetRepository.saveAndFlush(pointUseDet);
+        PointUse pointUse;
+        if (TestUtil.findAll(em, PointUse.class).isEmpty()) {
+            pointUse = PointUseResourceIT.createEntity(em);
+            em.persist(pointUse);
+            em.flush();
+        } else {
+            pointUse = TestUtil.findAll(em, PointUse.class).get(0);
+        }
+        em.persist(pointUse);
+        em.flush();
+        pointUseDet.setPointUse(pointUse);
+        pointUseDetRepository.saveAndFlush(pointUseDet);
+        Long pointUseId = pointUse.getId();
+
+        // Get all the pointUseDetList where pointUse equals to pointUseId
+        defaultPointUseDetShouldBeFound("pointUseId.equals=" + pointUseId);
+
+        // Get all the pointUseDetList where pointUse equals to (pointUseId + 1)
+        defaultPointUseDetShouldNotBeFound("pointUseId.equals=" + (pointUseId + 1));
+    }
+
+    @Test
+    @Transactional
+    void getAllPointUseDetsByBagOfPointIsEqualToSomething() throws Exception {
+        // Initialize the database
+        pointUseDetRepository.saveAndFlush(pointUseDet);
+        BagOfPoint bagOfPoint;
+        if (TestUtil.findAll(em, BagOfPoint.class).isEmpty()) {
+            bagOfPoint = BagOfPointResourceIT.createEntity(em);
+            em.persist(bagOfPoint);
+            em.flush();
+        } else {
+            bagOfPoint = TestUtil.findAll(em, BagOfPoint.class).get(0);
+        }
+        em.persist(bagOfPoint);
+        em.flush();
+        pointUseDet.setBagOfPoint(bagOfPoint);
+        pointUseDetRepository.saveAndFlush(pointUseDet);
+        Long bagOfPointId = bagOfPoint.getId();
+
+        // Get all the pointUseDetList where bagOfPoint equals to bagOfPointId
+        defaultPointUseDetShouldBeFound("bagOfPointId.equals=" + bagOfPointId);
+
+        // Get all the pointUseDetList where bagOfPoint equals to (bagOfPointId + 1)
+        defaultPointUseDetShouldNotBeFound("bagOfPointId.equals=" + (bagOfPointId + 1));
+    }
+
+    /**
+     * Executes the search, and checks that the default entity is returned.
+     */
+    private void defaultPointUseDetShouldBeFound(String filter) throws Exception {
+        restPointUseDetMockMvc
+            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(jsonPath("$.[*].id").value(hasItem(pointUseDet.getId().intValue())))
+            .andExpect(jsonPath("$.[*].scoreUsed").value(hasItem(DEFAULT_SCORE_USED.intValue())));
+
+        // Check, that the count call also returns 1
+        restPointUseDetMockMvc
+            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(content().string("1"));
+    }
+
+    /**
+     * Executes the search, and checks that the default entity is not returned.
+     */
+    private void defaultPointUseDetShouldNotBeFound(String filter) throws Exception {
+        restPointUseDetMockMvc
+            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(jsonPath("$").isArray())
+            .andExpect(jsonPath("$").isEmpty());
+
+        // Check, that the count call also returns 0
+        restPointUseDetMockMvc
+            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(content().string("0"));
     }
 
     @Test

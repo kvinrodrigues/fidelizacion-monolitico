@@ -2,7 +2,9 @@ package com.mycompany.myapp.web.rest;
 
 import com.mycompany.myapp.domain.Client;
 import com.mycompany.myapp.repository.ClientRepository;
+import com.mycompany.myapp.service.ClientQueryService;
 import com.mycompany.myapp.service.ClientService;
+import com.mycompany.myapp.service.criteria.ClientCriteria;
 import com.mycompany.myapp.web.rest.errors.BadRequestAlertException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -37,9 +39,12 @@ public class ClientResource {
 
     private final ClientRepository clientRepository;
 
-    public ClientResource(ClientService clientService, ClientRepository clientRepository) {
+    private final ClientQueryService clientQueryService;
+
+    public ClientResource(ClientService clientService, ClientRepository clientRepository, ClientQueryService clientQueryService) {
         this.clientService = clientService;
         this.clientRepository = clientRepository;
+        this.clientQueryService = clientQueryService;
     }
 
     /**
@@ -135,12 +140,26 @@ public class ClientResource {
     /**
      * {@code GET  /clients} : get all the clients.
      *
+     * @param criteria the criteria which the requested entities should match.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of clients in body.
      */
     @GetMapping("/clients")
-    public List<Client> getAllClients() {
-        log.debug("REST request to get all Clients");
-        return clientService.findAll();
+    public ResponseEntity<List<Client>> getAllClients(ClientCriteria criteria) {
+        log.debug("REST request to get Clients by criteria: {}", criteria);
+        List<Client> entityList = clientQueryService.findByCriteria(criteria);
+        return ResponseEntity.ok().body(entityList);
+    }
+
+    /**
+     * {@code GET  /clients/count} : count all the clients.
+     *
+     * @param criteria the criteria which the requested entities should match.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count in body.
+     */
+    @GetMapping("/clients/count")
+    public ResponseEntity<Long> countClients(ClientCriteria criteria) {
+        log.debug("REST request to count Clients by criteria: {}", criteria);
+        return ResponseEntity.ok().body(clientQueryService.countByCriteria(criteria));
     }
 
     /**

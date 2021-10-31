@@ -7,7 +7,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.mycompany.myapp.IntegrationTest;
 import com.mycompany.myapp.domain.BagOfPoint;
+import com.mycompany.myapp.domain.Client;
+import com.mycompany.myapp.domain.PointUseDet;
 import com.mycompany.myapp.repository.BagOfPointRepository;
+import com.mycompany.myapp.service.criteria.BagOfPointCriteria;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -39,15 +42,19 @@ class BagOfPointResourceIT {
 
     private static final Long DEFAULT_ASSIGNED_SCORE = 1L;
     private static final Long UPDATED_ASSIGNED_SCORE = 2L;
+    private static final Long SMALLER_ASSIGNED_SCORE = 1L - 1L;
 
     private static final Long DEFAULT_SCORE_USED = 1L;
     private static final Long UPDATED_SCORE_USED = 2L;
+    private static final Long SMALLER_SCORE_USED = 1L - 1L;
 
     private static final Long DEFAULT_SCORE_BALANCE = 1L;
     private static final Long UPDATED_SCORE_BALANCE = 2L;
+    private static final Long SMALLER_SCORE_BALANCE = 1L - 1L;
 
     private static final Float DEFAULT_OPERATION_AMOUNT = 1F;
     private static final Float UPDATED_OPERATION_AMOUNT = 2F;
+    private static final Float SMALLER_OPERATION_AMOUNT = 1F - 1F;
 
     private static final String ENTITY_API_URL = "/api/bag-of-points";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
@@ -284,6 +291,639 @@ class BagOfPointResourceIT {
             .andExpect(jsonPath("$.scoreUsed").value(DEFAULT_SCORE_USED.intValue()))
             .andExpect(jsonPath("$.scoreBalance").value(DEFAULT_SCORE_BALANCE.intValue()))
             .andExpect(jsonPath("$.operationAmount").value(DEFAULT_OPERATION_AMOUNT.doubleValue()));
+    }
+
+    @Test
+    @Transactional
+    void getBagOfPointsByIdFiltering() throws Exception {
+        // Initialize the database
+        bagOfPointRepository.saveAndFlush(bagOfPoint);
+
+        Long id = bagOfPoint.getId();
+
+        defaultBagOfPointShouldBeFound("id.equals=" + id);
+        defaultBagOfPointShouldNotBeFound("id.notEquals=" + id);
+
+        defaultBagOfPointShouldBeFound("id.greaterThanOrEqual=" + id);
+        defaultBagOfPointShouldNotBeFound("id.greaterThan=" + id);
+
+        defaultBagOfPointShouldBeFound("id.lessThanOrEqual=" + id);
+        defaultBagOfPointShouldNotBeFound("id.lessThan=" + id);
+    }
+
+    @Test
+    @Transactional
+    void getAllBagOfPointsByAsignationDateIsEqualToSomething() throws Exception {
+        // Initialize the database
+        bagOfPointRepository.saveAndFlush(bagOfPoint);
+
+        // Get all the bagOfPointList where asignationDate equals to DEFAULT_ASIGNATION_DATE
+        defaultBagOfPointShouldBeFound("asignationDate.equals=" + DEFAULT_ASIGNATION_DATE);
+
+        // Get all the bagOfPointList where asignationDate equals to UPDATED_ASIGNATION_DATE
+        defaultBagOfPointShouldNotBeFound("asignationDate.equals=" + UPDATED_ASIGNATION_DATE);
+    }
+
+    @Test
+    @Transactional
+    void getAllBagOfPointsByAsignationDateIsNotEqualToSomething() throws Exception {
+        // Initialize the database
+        bagOfPointRepository.saveAndFlush(bagOfPoint);
+
+        // Get all the bagOfPointList where asignationDate not equals to DEFAULT_ASIGNATION_DATE
+        defaultBagOfPointShouldNotBeFound("asignationDate.notEquals=" + DEFAULT_ASIGNATION_DATE);
+
+        // Get all the bagOfPointList where asignationDate not equals to UPDATED_ASIGNATION_DATE
+        defaultBagOfPointShouldBeFound("asignationDate.notEquals=" + UPDATED_ASIGNATION_DATE);
+    }
+
+    @Test
+    @Transactional
+    void getAllBagOfPointsByAsignationDateIsInShouldWork() throws Exception {
+        // Initialize the database
+        bagOfPointRepository.saveAndFlush(bagOfPoint);
+
+        // Get all the bagOfPointList where asignationDate in DEFAULT_ASIGNATION_DATE or UPDATED_ASIGNATION_DATE
+        defaultBagOfPointShouldBeFound("asignationDate.in=" + DEFAULT_ASIGNATION_DATE + "," + UPDATED_ASIGNATION_DATE);
+
+        // Get all the bagOfPointList where asignationDate equals to UPDATED_ASIGNATION_DATE
+        defaultBagOfPointShouldNotBeFound("asignationDate.in=" + UPDATED_ASIGNATION_DATE);
+    }
+
+    @Test
+    @Transactional
+    void getAllBagOfPointsByAsignationDateIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        bagOfPointRepository.saveAndFlush(bagOfPoint);
+
+        // Get all the bagOfPointList where asignationDate is not null
+        defaultBagOfPointShouldBeFound("asignationDate.specified=true");
+
+        // Get all the bagOfPointList where asignationDate is null
+        defaultBagOfPointShouldNotBeFound("asignationDate.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllBagOfPointsByExpirationDateIsEqualToSomething() throws Exception {
+        // Initialize the database
+        bagOfPointRepository.saveAndFlush(bagOfPoint);
+
+        // Get all the bagOfPointList where expirationDate equals to DEFAULT_EXPIRATION_DATE
+        defaultBagOfPointShouldBeFound("expirationDate.equals=" + DEFAULT_EXPIRATION_DATE);
+
+        // Get all the bagOfPointList where expirationDate equals to UPDATED_EXPIRATION_DATE
+        defaultBagOfPointShouldNotBeFound("expirationDate.equals=" + UPDATED_EXPIRATION_DATE);
+    }
+
+    @Test
+    @Transactional
+    void getAllBagOfPointsByExpirationDateIsNotEqualToSomething() throws Exception {
+        // Initialize the database
+        bagOfPointRepository.saveAndFlush(bagOfPoint);
+
+        // Get all the bagOfPointList where expirationDate not equals to DEFAULT_EXPIRATION_DATE
+        defaultBagOfPointShouldNotBeFound("expirationDate.notEquals=" + DEFAULT_EXPIRATION_DATE);
+
+        // Get all the bagOfPointList where expirationDate not equals to UPDATED_EXPIRATION_DATE
+        defaultBagOfPointShouldBeFound("expirationDate.notEquals=" + UPDATED_EXPIRATION_DATE);
+    }
+
+    @Test
+    @Transactional
+    void getAllBagOfPointsByExpirationDateIsInShouldWork() throws Exception {
+        // Initialize the database
+        bagOfPointRepository.saveAndFlush(bagOfPoint);
+
+        // Get all the bagOfPointList where expirationDate in DEFAULT_EXPIRATION_DATE or UPDATED_EXPIRATION_DATE
+        defaultBagOfPointShouldBeFound("expirationDate.in=" + DEFAULT_EXPIRATION_DATE + "," + UPDATED_EXPIRATION_DATE);
+
+        // Get all the bagOfPointList where expirationDate equals to UPDATED_EXPIRATION_DATE
+        defaultBagOfPointShouldNotBeFound("expirationDate.in=" + UPDATED_EXPIRATION_DATE);
+    }
+
+    @Test
+    @Transactional
+    void getAllBagOfPointsByExpirationDateIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        bagOfPointRepository.saveAndFlush(bagOfPoint);
+
+        // Get all the bagOfPointList where expirationDate is not null
+        defaultBagOfPointShouldBeFound("expirationDate.specified=true");
+
+        // Get all the bagOfPointList where expirationDate is null
+        defaultBagOfPointShouldNotBeFound("expirationDate.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllBagOfPointsByAssignedScoreIsEqualToSomething() throws Exception {
+        // Initialize the database
+        bagOfPointRepository.saveAndFlush(bagOfPoint);
+
+        // Get all the bagOfPointList where assignedScore equals to DEFAULT_ASSIGNED_SCORE
+        defaultBagOfPointShouldBeFound("assignedScore.equals=" + DEFAULT_ASSIGNED_SCORE);
+
+        // Get all the bagOfPointList where assignedScore equals to UPDATED_ASSIGNED_SCORE
+        defaultBagOfPointShouldNotBeFound("assignedScore.equals=" + UPDATED_ASSIGNED_SCORE);
+    }
+
+    @Test
+    @Transactional
+    void getAllBagOfPointsByAssignedScoreIsNotEqualToSomething() throws Exception {
+        // Initialize the database
+        bagOfPointRepository.saveAndFlush(bagOfPoint);
+
+        // Get all the bagOfPointList where assignedScore not equals to DEFAULT_ASSIGNED_SCORE
+        defaultBagOfPointShouldNotBeFound("assignedScore.notEquals=" + DEFAULT_ASSIGNED_SCORE);
+
+        // Get all the bagOfPointList where assignedScore not equals to UPDATED_ASSIGNED_SCORE
+        defaultBagOfPointShouldBeFound("assignedScore.notEquals=" + UPDATED_ASSIGNED_SCORE);
+    }
+
+    @Test
+    @Transactional
+    void getAllBagOfPointsByAssignedScoreIsInShouldWork() throws Exception {
+        // Initialize the database
+        bagOfPointRepository.saveAndFlush(bagOfPoint);
+
+        // Get all the bagOfPointList where assignedScore in DEFAULT_ASSIGNED_SCORE or UPDATED_ASSIGNED_SCORE
+        defaultBagOfPointShouldBeFound("assignedScore.in=" + DEFAULT_ASSIGNED_SCORE + "," + UPDATED_ASSIGNED_SCORE);
+
+        // Get all the bagOfPointList where assignedScore equals to UPDATED_ASSIGNED_SCORE
+        defaultBagOfPointShouldNotBeFound("assignedScore.in=" + UPDATED_ASSIGNED_SCORE);
+    }
+
+    @Test
+    @Transactional
+    void getAllBagOfPointsByAssignedScoreIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        bagOfPointRepository.saveAndFlush(bagOfPoint);
+
+        // Get all the bagOfPointList where assignedScore is not null
+        defaultBagOfPointShouldBeFound("assignedScore.specified=true");
+
+        // Get all the bagOfPointList where assignedScore is null
+        defaultBagOfPointShouldNotBeFound("assignedScore.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllBagOfPointsByAssignedScoreIsGreaterThanOrEqualToSomething() throws Exception {
+        // Initialize the database
+        bagOfPointRepository.saveAndFlush(bagOfPoint);
+
+        // Get all the bagOfPointList where assignedScore is greater than or equal to DEFAULT_ASSIGNED_SCORE
+        defaultBagOfPointShouldBeFound("assignedScore.greaterThanOrEqual=" + DEFAULT_ASSIGNED_SCORE);
+
+        // Get all the bagOfPointList where assignedScore is greater than or equal to UPDATED_ASSIGNED_SCORE
+        defaultBagOfPointShouldNotBeFound("assignedScore.greaterThanOrEqual=" + UPDATED_ASSIGNED_SCORE);
+    }
+
+    @Test
+    @Transactional
+    void getAllBagOfPointsByAssignedScoreIsLessThanOrEqualToSomething() throws Exception {
+        // Initialize the database
+        bagOfPointRepository.saveAndFlush(bagOfPoint);
+
+        // Get all the bagOfPointList where assignedScore is less than or equal to DEFAULT_ASSIGNED_SCORE
+        defaultBagOfPointShouldBeFound("assignedScore.lessThanOrEqual=" + DEFAULT_ASSIGNED_SCORE);
+
+        // Get all the bagOfPointList where assignedScore is less than or equal to SMALLER_ASSIGNED_SCORE
+        defaultBagOfPointShouldNotBeFound("assignedScore.lessThanOrEqual=" + SMALLER_ASSIGNED_SCORE);
+    }
+
+    @Test
+    @Transactional
+    void getAllBagOfPointsByAssignedScoreIsLessThanSomething() throws Exception {
+        // Initialize the database
+        bagOfPointRepository.saveAndFlush(bagOfPoint);
+
+        // Get all the bagOfPointList where assignedScore is less than DEFAULT_ASSIGNED_SCORE
+        defaultBagOfPointShouldNotBeFound("assignedScore.lessThan=" + DEFAULT_ASSIGNED_SCORE);
+
+        // Get all the bagOfPointList where assignedScore is less than UPDATED_ASSIGNED_SCORE
+        defaultBagOfPointShouldBeFound("assignedScore.lessThan=" + UPDATED_ASSIGNED_SCORE);
+    }
+
+    @Test
+    @Transactional
+    void getAllBagOfPointsByAssignedScoreIsGreaterThanSomething() throws Exception {
+        // Initialize the database
+        bagOfPointRepository.saveAndFlush(bagOfPoint);
+
+        // Get all the bagOfPointList where assignedScore is greater than DEFAULT_ASSIGNED_SCORE
+        defaultBagOfPointShouldNotBeFound("assignedScore.greaterThan=" + DEFAULT_ASSIGNED_SCORE);
+
+        // Get all the bagOfPointList where assignedScore is greater than SMALLER_ASSIGNED_SCORE
+        defaultBagOfPointShouldBeFound("assignedScore.greaterThan=" + SMALLER_ASSIGNED_SCORE);
+    }
+
+    @Test
+    @Transactional
+    void getAllBagOfPointsByScoreUsedIsEqualToSomething() throws Exception {
+        // Initialize the database
+        bagOfPointRepository.saveAndFlush(bagOfPoint);
+
+        // Get all the bagOfPointList where scoreUsed equals to DEFAULT_SCORE_USED
+        defaultBagOfPointShouldBeFound("scoreUsed.equals=" + DEFAULT_SCORE_USED);
+
+        // Get all the bagOfPointList where scoreUsed equals to UPDATED_SCORE_USED
+        defaultBagOfPointShouldNotBeFound("scoreUsed.equals=" + UPDATED_SCORE_USED);
+    }
+
+    @Test
+    @Transactional
+    void getAllBagOfPointsByScoreUsedIsNotEqualToSomething() throws Exception {
+        // Initialize the database
+        bagOfPointRepository.saveAndFlush(bagOfPoint);
+
+        // Get all the bagOfPointList where scoreUsed not equals to DEFAULT_SCORE_USED
+        defaultBagOfPointShouldNotBeFound("scoreUsed.notEquals=" + DEFAULT_SCORE_USED);
+
+        // Get all the bagOfPointList where scoreUsed not equals to UPDATED_SCORE_USED
+        defaultBagOfPointShouldBeFound("scoreUsed.notEquals=" + UPDATED_SCORE_USED);
+    }
+
+    @Test
+    @Transactional
+    void getAllBagOfPointsByScoreUsedIsInShouldWork() throws Exception {
+        // Initialize the database
+        bagOfPointRepository.saveAndFlush(bagOfPoint);
+
+        // Get all the bagOfPointList where scoreUsed in DEFAULT_SCORE_USED or UPDATED_SCORE_USED
+        defaultBagOfPointShouldBeFound("scoreUsed.in=" + DEFAULT_SCORE_USED + "," + UPDATED_SCORE_USED);
+
+        // Get all the bagOfPointList where scoreUsed equals to UPDATED_SCORE_USED
+        defaultBagOfPointShouldNotBeFound("scoreUsed.in=" + UPDATED_SCORE_USED);
+    }
+
+    @Test
+    @Transactional
+    void getAllBagOfPointsByScoreUsedIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        bagOfPointRepository.saveAndFlush(bagOfPoint);
+
+        // Get all the bagOfPointList where scoreUsed is not null
+        defaultBagOfPointShouldBeFound("scoreUsed.specified=true");
+
+        // Get all the bagOfPointList where scoreUsed is null
+        defaultBagOfPointShouldNotBeFound("scoreUsed.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllBagOfPointsByScoreUsedIsGreaterThanOrEqualToSomething() throws Exception {
+        // Initialize the database
+        bagOfPointRepository.saveAndFlush(bagOfPoint);
+
+        // Get all the bagOfPointList where scoreUsed is greater than or equal to DEFAULT_SCORE_USED
+        defaultBagOfPointShouldBeFound("scoreUsed.greaterThanOrEqual=" + DEFAULT_SCORE_USED);
+
+        // Get all the bagOfPointList where scoreUsed is greater than or equal to UPDATED_SCORE_USED
+        defaultBagOfPointShouldNotBeFound("scoreUsed.greaterThanOrEqual=" + UPDATED_SCORE_USED);
+    }
+
+    @Test
+    @Transactional
+    void getAllBagOfPointsByScoreUsedIsLessThanOrEqualToSomething() throws Exception {
+        // Initialize the database
+        bagOfPointRepository.saveAndFlush(bagOfPoint);
+
+        // Get all the bagOfPointList where scoreUsed is less than or equal to DEFAULT_SCORE_USED
+        defaultBagOfPointShouldBeFound("scoreUsed.lessThanOrEqual=" + DEFAULT_SCORE_USED);
+
+        // Get all the bagOfPointList where scoreUsed is less than or equal to SMALLER_SCORE_USED
+        defaultBagOfPointShouldNotBeFound("scoreUsed.lessThanOrEqual=" + SMALLER_SCORE_USED);
+    }
+
+    @Test
+    @Transactional
+    void getAllBagOfPointsByScoreUsedIsLessThanSomething() throws Exception {
+        // Initialize the database
+        bagOfPointRepository.saveAndFlush(bagOfPoint);
+
+        // Get all the bagOfPointList where scoreUsed is less than DEFAULT_SCORE_USED
+        defaultBagOfPointShouldNotBeFound("scoreUsed.lessThan=" + DEFAULT_SCORE_USED);
+
+        // Get all the bagOfPointList where scoreUsed is less than UPDATED_SCORE_USED
+        defaultBagOfPointShouldBeFound("scoreUsed.lessThan=" + UPDATED_SCORE_USED);
+    }
+
+    @Test
+    @Transactional
+    void getAllBagOfPointsByScoreUsedIsGreaterThanSomething() throws Exception {
+        // Initialize the database
+        bagOfPointRepository.saveAndFlush(bagOfPoint);
+
+        // Get all the bagOfPointList where scoreUsed is greater than DEFAULT_SCORE_USED
+        defaultBagOfPointShouldNotBeFound("scoreUsed.greaterThan=" + DEFAULT_SCORE_USED);
+
+        // Get all the bagOfPointList where scoreUsed is greater than SMALLER_SCORE_USED
+        defaultBagOfPointShouldBeFound("scoreUsed.greaterThan=" + SMALLER_SCORE_USED);
+    }
+
+    @Test
+    @Transactional
+    void getAllBagOfPointsByScoreBalanceIsEqualToSomething() throws Exception {
+        // Initialize the database
+        bagOfPointRepository.saveAndFlush(bagOfPoint);
+
+        // Get all the bagOfPointList where scoreBalance equals to DEFAULT_SCORE_BALANCE
+        defaultBagOfPointShouldBeFound("scoreBalance.equals=" + DEFAULT_SCORE_BALANCE);
+
+        // Get all the bagOfPointList where scoreBalance equals to UPDATED_SCORE_BALANCE
+        defaultBagOfPointShouldNotBeFound("scoreBalance.equals=" + UPDATED_SCORE_BALANCE);
+    }
+
+    @Test
+    @Transactional
+    void getAllBagOfPointsByScoreBalanceIsNotEqualToSomething() throws Exception {
+        // Initialize the database
+        bagOfPointRepository.saveAndFlush(bagOfPoint);
+
+        // Get all the bagOfPointList where scoreBalance not equals to DEFAULT_SCORE_BALANCE
+        defaultBagOfPointShouldNotBeFound("scoreBalance.notEquals=" + DEFAULT_SCORE_BALANCE);
+
+        // Get all the bagOfPointList where scoreBalance not equals to UPDATED_SCORE_BALANCE
+        defaultBagOfPointShouldBeFound("scoreBalance.notEquals=" + UPDATED_SCORE_BALANCE);
+    }
+
+    @Test
+    @Transactional
+    void getAllBagOfPointsByScoreBalanceIsInShouldWork() throws Exception {
+        // Initialize the database
+        bagOfPointRepository.saveAndFlush(bagOfPoint);
+
+        // Get all the bagOfPointList where scoreBalance in DEFAULT_SCORE_BALANCE or UPDATED_SCORE_BALANCE
+        defaultBagOfPointShouldBeFound("scoreBalance.in=" + DEFAULT_SCORE_BALANCE + "," + UPDATED_SCORE_BALANCE);
+
+        // Get all the bagOfPointList where scoreBalance equals to UPDATED_SCORE_BALANCE
+        defaultBagOfPointShouldNotBeFound("scoreBalance.in=" + UPDATED_SCORE_BALANCE);
+    }
+
+    @Test
+    @Transactional
+    void getAllBagOfPointsByScoreBalanceIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        bagOfPointRepository.saveAndFlush(bagOfPoint);
+
+        // Get all the bagOfPointList where scoreBalance is not null
+        defaultBagOfPointShouldBeFound("scoreBalance.specified=true");
+
+        // Get all the bagOfPointList where scoreBalance is null
+        defaultBagOfPointShouldNotBeFound("scoreBalance.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllBagOfPointsByScoreBalanceIsGreaterThanOrEqualToSomething() throws Exception {
+        // Initialize the database
+        bagOfPointRepository.saveAndFlush(bagOfPoint);
+
+        // Get all the bagOfPointList where scoreBalance is greater than or equal to DEFAULT_SCORE_BALANCE
+        defaultBagOfPointShouldBeFound("scoreBalance.greaterThanOrEqual=" + DEFAULT_SCORE_BALANCE);
+
+        // Get all the bagOfPointList where scoreBalance is greater than or equal to UPDATED_SCORE_BALANCE
+        defaultBagOfPointShouldNotBeFound("scoreBalance.greaterThanOrEqual=" + UPDATED_SCORE_BALANCE);
+    }
+
+    @Test
+    @Transactional
+    void getAllBagOfPointsByScoreBalanceIsLessThanOrEqualToSomething() throws Exception {
+        // Initialize the database
+        bagOfPointRepository.saveAndFlush(bagOfPoint);
+
+        // Get all the bagOfPointList where scoreBalance is less than or equal to DEFAULT_SCORE_BALANCE
+        defaultBagOfPointShouldBeFound("scoreBalance.lessThanOrEqual=" + DEFAULT_SCORE_BALANCE);
+
+        // Get all the bagOfPointList where scoreBalance is less than or equal to SMALLER_SCORE_BALANCE
+        defaultBagOfPointShouldNotBeFound("scoreBalance.lessThanOrEqual=" + SMALLER_SCORE_BALANCE);
+    }
+
+    @Test
+    @Transactional
+    void getAllBagOfPointsByScoreBalanceIsLessThanSomething() throws Exception {
+        // Initialize the database
+        bagOfPointRepository.saveAndFlush(bagOfPoint);
+
+        // Get all the bagOfPointList where scoreBalance is less than DEFAULT_SCORE_BALANCE
+        defaultBagOfPointShouldNotBeFound("scoreBalance.lessThan=" + DEFAULT_SCORE_BALANCE);
+
+        // Get all the bagOfPointList where scoreBalance is less than UPDATED_SCORE_BALANCE
+        defaultBagOfPointShouldBeFound("scoreBalance.lessThan=" + UPDATED_SCORE_BALANCE);
+    }
+
+    @Test
+    @Transactional
+    void getAllBagOfPointsByScoreBalanceIsGreaterThanSomething() throws Exception {
+        // Initialize the database
+        bagOfPointRepository.saveAndFlush(bagOfPoint);
+
+        // Get all the bagOfPointList where scoreBalance is greater than DEFAULT_SCORE_BALANCE
+        defaultBagOfPointShouldNotBeFound("scoreBalance.greaterThan=" + DEFAULT_SCORE_BALANCE);
+
+        // Get all the bagOfPointList where scoreBalance is greater than SMALLER_SCORE_BALANCE
+        defaultBagOfPointShouldBeFound("scoreBalance.greaterThan=" + SMALLER_SCORE_BALANCE);
+    }
+
+    @Test
+    @Transactional
+    void getAllBagOfPointsByOperationAmountIsEqualToSomething() throws Exception {
+        // Initialize the database
+        bagOfPointRepository.saveAndFlush(bagOfPoint);
+
+        // Get all the bagOfPointList where operationAmount equals to DEFAULT_OPERATION_AMOUNT
+        defaultBagOfPointShouldBeFound("operationAmount.equals=" + DEFAULT_OPERATION_AMOUNT);
+
+        // Get all the bagOfPointList where operationAmount equals to UPDATED_OPERATION_AMOUNT
+        defaultBagOfPointShouldNotBeFound("operationAmount.equals=" + UPDATED_OPERATION_AMOUNT);
+    }
+
+    @Test
+    @Transactional
+    void getAllBagOfPointsByOperationAmountIsNotEqualToSomething() throws Exception {
+        // Initialize the database
+        bagOfPointRepository.saveAndFlush(bagOfPoint);
+
+        // Get all the bagOfPointList where operationAmount not equals to DEFAULT_OPERATION_AMOUNT
+        defaultBagOfPointShouldNotBeFound("operationAmount.notEquals=" + DEFAULT_OPERATION_AMOUNT);
+
+        // Get all the bagOfPointList where operationAmount not equals to UPDATED_OPERATION_AMOUNT
+        defaultBagOfPointShouldBeFound("operationAmount.notEquals=" + UPDATED_OPERATION_AMOUNT);
+    }
+
+    @Test
+    @Transactional
+    void getAllBagOfPointsByOperationAmountIsInShouldWork() throws Exception {
+        // Initialize the database
+        bagOfPointRepository.saveAndFlush(bagOfPoint);
+
+        // Get all the bagOfPointList where operationAmount in DEFAULT_OPERATION_AMOUNT or UPDATED_OPERATION_AMOUNT
+        defaultBagOfPointShouldBeFound("operationAmount.in=" + DEFAULT_OPERATION_AMOUNT + "," + UPDATED_OPERATION_AMOUNT);
+
+        // Get all the bagOfPointList where operationAmount equals to UPDATED_OPERATION_AMOUNT
+        defaultBagOfPointShouldNotBeFound("operationAmount.in=" + UPDATED_OPERATION_AMOUNT);
+    }
+
+    @Test
+    @Transactional
+    void getAllBagOfPointsByOperationAmountIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        bagOfPointRepository.saveAndFlush(bagOfPoint);
+
+        // Get all the bagOfPointList where operationAmount is not null
+        defaultBagOfPointShouldBeFound("operationAmount.specified=true");
+
+        // Get all the bagOfPointList where operationAmount is null
+        defaultBagOfPointShouldNotBeFound("operationAmount.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllBagOfPointsByOperationAmountIsGreaterThanOrEqualToSomething() throws Exception {
+        // Initialize the database
+        bagOfPointRepository.saveAndFlush(bagOfPoint);
+
+        // Get all the bagOfPointList where operationAmount is greater than or equal to DEFAULT_OPERATION_AMOUNT
+        defaultBagOfPointShouldBeFound("operationAmount.greaterThanOrEqual=" + DEFAULT_OPERATION_AMOUNT);
+
+        // Get all the bagOfPointList where operationAmount is greater than or equal to UPDATED_OPERATION_AMOUNT
+        defaultBagOfPointShouldNotBeFound("operationAmount.greaterThanOrEqual=" + UPDATED_OPERATION_AMOUNT);
+    }
+
+    @Test
+    @Transactional
+    void getAllBagOfPointsByOperationAmountIsLessThanOrEqualToSomething() throws Exception {
+        // Initialize the database
+        bagOfPointRepository.saveAndFlush(bagOfPoint);
+
+        // Get all the bagOfPointList where operationAmount is less than or equal to DEFAULT_OPERATION_AMOUNT
+        defaultBagOfPointShouldBeFound("operationAmount.lessThanOrEqual=" + DEFAULT_OPERATION_AMOUNT);
+
+        // Get all the bagOfPointList where operationAmount is less than or equal to SMALLER_OPERATION_AMOUNT
+        defaultBagOfPointShouldNotBeFound("operationAmount.lessThanOrEqual=" + SMALLER_OPERATION_AMOUNT);
+    }
+
+    @Test
+    @Transactional
+    void getAllBagOfPointsByOperationAmountIsLessThanSomething() throws Exception {
+        // Initialize the database
+        bagOfPointRepository.saveAndFlush(bagOfPoint);
+
+        // Get all the bagOfPointList where operationAmount is less than DEFAULT_OPERATION_AMOUNT
+        defaultBagOfPointShouldNotBeFound("operationAmount.lessThan=" + DEFAULT_OPERATION_AMOUNT);
+
+        // Get all the bagOfPointList where operationAmount is less than UPDATED_OPERATION_AMOUNT
+        defaultBagOfPointShouldBeFound("operationAmount.lessThan=" + UPDATED_OPERATION_AMOUNT);
+    }
+
+    @Test
+    @Transactional
+    void getAllBagOfPointsByOperationAmountIsGreaterThanSomething() throws Exception {
+        // Initialize the database
+        bagOfPointRepository.saveAndFlush(bagOfPoint);
+
+        // Get all the bagOfPointList where operationAmount is greater than DEFAULT_OPERATION_AMOUNT
+        defaultBagOfPointShouldNotBeFound("operationAmount.greaterThan=" + DEFAULT_OPERATION_AMOUNT);
+
+        // Get all the bagOfPointList where operationAmount is greater than SMALLER_OPERATION_AMOUNT
+        defaultBagOfPointShouldBeFound("operationAmount.greaterThan=" + SMALLER_OPERATION_AMOUNT);
+    }
+
+    @Test
+    @Transactional
+    void getAllBagOfPointsByClientIsEqualToSomething() throws Exception {
+        // Initialize the database
+        bagOfPointRepository.saveAndFlush(bagOfPoint);
+        Client client;
+        if (TestUtil.findAll(em, Client.class).isEmpty()) {
+            client = ClientResourceIT.createEntity(em);
+            em.persist(client);
+            em.flush();
+        } else {
+            client = TestUtil.findAll(em, Client.class).get(0);
+        }
+        em.persist(client);
+        em.flush();
+        bagOfPoint.addClient(client);
+        bagOfPointRepository.saveAndFlush(bagOfPoint);
+        Long clientId = client.getId();
+
+        // Get all the bagOfPointList where client equals to clientId
+        defaultBagOfPointShouldBeFound("clientId.equals=" + clientId);
+
+        // Get all the bagOfPointList where client equals to (clientId + 1)
+        defaultBagOfPointShouldNotBeFound("clientId.equals=" + (clientId + 1));
+    }
+
+    @Test
+    @Transactional
+    void getAllBagOfPointsByPointUseDetailIsEqualToSomething() throws Exception {
+        // Initialize the database
+        bagOfPointRepository.saveAndFlush(bagOfPoint);
+        PointUseDet pointUseDetail;
+        if (TestUtil.findAll(em, PointUseDet.class).isEmpty()) {
+            pointUseDetail = PointUseDetResourceIT.createEntity(em);
+            em.persist(pointUseDetail);
+            em.flush();
+        } else {
+            pointUseDetail = TestUtil.findAll(em, PointUseDet.class).get(0);
+        }
+        em.persist(pointUseDetail);
+        em.flush();
+        bagOfPoint.addPointUseDetail(pointUseDetail);
+        bagOfPointRepository.saveAndFlush(bagOfPoint);
+        Long pointUseDetailId = pointUseDetail.getId();
+
+        // Get all the bagOfPointList where pointUseDetail equals to pointUseDetailId
+        defaultBagOfPointShouldBeFound("pointUseDetailId.equals=" + pointUseDetailId);
+
+        // Get all the bagOfPointList where pointUseDetail equals to (pointUseDetailId + 1)
+        defaultBagOfPointShouldNotBeFound("pointUseDetailId.equals=" + (pointUseDetailId + 1));
+    }
+
+    /**
+     * Executes the search, and checks that the default entity is returned.
+     */
+    private void defaultBagOfPointShouldBeFound(String filter) throws Exception {
+        restBagOfPointMockMvc
+            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(jsonPath("$.[*].id").value(hasItem(bagOfPoint.getId().intValue())))
+            .andExpect(jsonPath("$.[*].asignationDate").value(hasItem(DEFAULT_ASIGNATION_DATE.toString())))
+            .andExpect(jsonPath("$.[*].expirationDate").value(hasItem(DEFAULT_EXPIRATION_DATE.toString())))
+            .andExpect(jsonPath("$.[*].assignedScore").value(hasItem(DEFAULT_ASSIGNED_SCORE.intValue())))
+            .andExpect(jsonPath("$.[*].scoreUsed").value(hasItem(DEFAULT_SCORE_USED.intValue())))
+            .andExpect(jsonPath("$.[*].scoreBalance").value(hasItem(DEFAULT_SCORE_BALANCE.intValue())))
+            .andExpect(jsonPath("$.[*].operationAmount").value(hasItem(DEFAULT_OPERATION_AMOUNT.doubleValue())));
+
+        // Check, that the count call also returns 1
+        restBagOfPointMockMvc
+            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(content().string("1"));
+    }
+
+    /**
+     * Executes the search, and checks that the default entity is not returned.
+     */
+    private void defaultBagOfPointShouldNotBeFound(String filter) throws Exception {
+        restBagOfPointMockMvc
+            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(jsonPath("$").isArray())
+            .andExpect(jsonPath("$").isEmpty());
+
+        // Check, that the count call also returns 0
+        restBagOfPointMockMvc
+            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(content().string("0"));
     }
 
     @Test

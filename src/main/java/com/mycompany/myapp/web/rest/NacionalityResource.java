@@ -2,7 +2,9 @@ package com.mycompany.myapp.web.rest;
 
 import com.mycompany.myapp.domain.Nacionality;
 import com.mycompany.myapp.repository.NacionalityRepository;
+import com.mycompany.myapp.service.NacionalityQueryService;
 import com.mycompany.myapp.service.NacionalityService;
+import com.mycompany.myapp.service.criteria.NacionalityCriteria;
 import com.mycompany.myapp.web.rest.errors.BadRequestAlertException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -37,9 +39,16 @@ public class NacionalityResource {
 
     private final NacionalityRepository nacionalityRepository;
 
-    public NacionalityResource(NacionalityService nacionalityService, NacionalityRepository nacionalityRepository) {
+    private final NacionalityQueryService nacionalityQueryService;
+
+    public NacionalityResource(
+        NacionalityService nacionalityService,
+        NacionalityRepository nacionalityRepository,
+        NacionalityQueryService nacionalityQueryService
+    ) {
         this.nacionalityService = nacionalityService;
         this.nacionalityRepository = nacionalityRepository;
+        this.nacionalityQueryService = nacionalityQueryService;
     }
 
     /**
@@ -135,12 +144,26 @@ public class NacionalityResource {
     /**
      * {@code GET  /nacionalities} : get all the nacionalities.
      *
+     * @param criteria the criteria which the requested entities should match.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of nacionalities in body.
      */
     @GetMapping("/nacionalities")
-    public List<Nacionality> getAllNacionalities() {
-        log.debug("REST request to get all Nacionalities");
-        return nacionalityService.findAll();
+    public ResponseEntity<List<Nacionality>> getAllNacionalities(NacionalityCriteria criteria) {
+        log.debug("REST request to get Nacionalities by criteria: {}", criteria);
+        List<Nacionality> entityList = nacionalityQueryService.findByCriteria(criteria);
+        return ResponseEntity.ok().body(entityList);
+    }
+
+    /**
+     * {@code GET  /nacionalities/count} : count all the nacionalities.
+     *
+     * @param criteria the criteria which the requested entities should match.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count in body.
+     */
+    @GetMapping("/nacionalities/count")
+    public ResponseEntity<Long> countNacionalities(NacionalityCriteria criteria) {
+        log.debug("REST request to count Nacionalities by criteria: {}", criteria);
+        return ResponseEntity.ok().body(nacionalityQueryService.countByCriteria(criteria));
     }
 
     /**

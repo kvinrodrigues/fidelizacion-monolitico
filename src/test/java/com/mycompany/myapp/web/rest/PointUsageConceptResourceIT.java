@@ -7,7 +7,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.mycompany.myapp.IntegrationTest;
 import com.mycompany.myapp.domain.PointUsageConcept;
+import com.mycompany.myapp.domain.PointUse;
 import com.mycompany.myapp.repository.PointUsageConceptRepository;
+import com.mycompany.myapp.service.criteria.PointUsageConceptCriteria;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
@@ -34,6 +36,7 @@ class PointUsageConceptResourceIT {
 
     private static final Long DEFAULT_REQUIRED_POINTS = 1L;
     private static final Long UPDATED_REQUIRED_POINTS = 2L;
+    private static final Long SMALLER_REQUIRED_POINTS = 1L - 1L;
 
     private static final String ENTITY_API_URL = "/api/point-usage-concepts";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
@@ -152,6 +155,271 @@ class PointUsageConceptResourceIT {
             .andExpect(jsonPath("$.id").value(pointUsageConcept.getId().intValue()))
             .andExpect(jsonPath("$.description").value(DEFAULT_DESCRIPTION))
             .andExpect(jsonPath("$.requiredPoints").value(DEFAULT_REQUIRED_POINTS.intValue()));
+    }
+
+    @Test
+    @Transactional
+    void getPointUsageConceptsByIdFiltering() throws Exception {
+        // Initialize the database
+        pointUsageConceptRepository.saveAndFlush(pointUsageConcept);
+
+        Long id = pointUsageConcept.getId();
+
+        defaultPointUsageConceptShouldBeFound("id.equals=" + id);
+        defaultPointUsageConceptShouldNotBeFound("id.notEquals=" + id);
+
+        defaultPointUsageConceptShouldBeFound("id.greaterThanOrEqual=" + id);
+        defaultPointUsageConceptShouldNotBeFound("id.greaterThan=" + id);
+
+        defaultPointUsageConceptShouldBeFound("id.lessThanOrEqual=" + id);
+        defaultPointUsageConceptShouldNotBeFound("id.lessThan=" + id);
+    }
+
+    @Test
+    @Transactional
+    void getAllPointUsageConceptsByDescriptionIsEqualToSomething() throws Exception {
+        // Initialize the database
+        pointUsageConceptRepository.saveAndFlush(pointUsageConcept);
+
+        // Get all the pointUsageConceptList where description equals to DEFAULT_DESCRIPTION
+        defaultPointUsageConceptShouldBeFound("description.equals=" + DEFAULT_DESCRIPTION);
+
+        // Get all the pointUsageConceptList where description equals to UPDATED_DESCRIPTION
+        defaultPointUsageConceptShouldNotBeFound("description.equals=" + UPDATED_DESCRIPTION);
+    }
+
+    @Test
+    @Transactional
+    void getAllPointUsageConceptsByDescriptionIsNotEqualToSomething() throws Exception {
+        // Initialize the database
+        pointUsageConceptRepository.saveAndFlush(pointUsageConcept);
+
+        // Get all the pointUsageConceptList where description not equals to DEFAULT_DESCRIPTION
+        defaultPointUsageConceptShouldNotBeFound("description.notEquals=" + DEFAULT_DESCRIPTION);
+
+        // Get all the pointUsageConceptList where description not equals to UPDATED_DESCRIPTION
+        defaultPointUsageConceptShouldBeFound("description.notEquals=" + UPDATED_DESCRIPTION);
+    }
+
+    @Test
+    @Transactional
+    void getAllPointUsageConceptsByDescriptionIsInShouldWork() throws Exception {
+        // Initialize the database
+        pointUsageConceptRepository.saveAndFlush(pointUsageConcept);
+
+        // Get all the pointUsageConceptList where description in DEFAULT_DESCRIPTION or UPDATED_DESCRIPTION
+        defaultPointUsageConceptShouldBeFound("description.in=" + DEFAULT_DESCRIPTION + "," + UPDATED_DESCRIPTION);
+
+        // Get all the pointUsageConceptList where description equals to UPDATED_DESCRIPTION
+        defaultPointUsageConceptShouldNotBeFound("description.in=" + UPDATED_DESCRIPTION);
+    }
+
+    @Test
+    @Transactional
+    void getAllPointUsageConceptsByDescriptionIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        pointUsageConceptRepository.saveAndFlush(pointUsageConcept);
+
+        // Get all the pointUsageConceptList where description is not null
+        defaultPointUsageConceptShouldBeFound("description.specified=true");
+
+        // Get all the pointUsageConceptList where description is null
+        defaultPointUsageConceptShouldNotBeFound("description.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllPointUsageConceptsByDescriptionContainsSomething() throws Exception {
+        // Initialize the database
+        pointUsageConceptRepository.saveAndFlush(pointUsageConcept);
+
+        // Get all the pointUsageConceptList where description contains DEFAULT_DESCRIPTION
+        defaultPointUsageConceptShouldBeFound("description.contains=" + DEFAULT_DESCRIPTION);
+
+        // Get all the pointUsageConceptList where description contains UPDATED_DESCRIPTION
+        defaultPointUsageConceptShouldNotBeFound("description.contains=" + UPDATED_DESCRIPTION);
+    }
+
+    @Test
+    @Transactional
+    void getAllPointUsageConceptsByDescriptionNotContainsSomething() throws Exception {
+        // Initialize the database
+        pointUsageConceptRepository.saveAndFlush(pointUsageConcept);
+
+        // Get all the pointUsageConceptList where description does not contain DEFAULT_DESCRIPTION
+        defaultPointUsageConceptShouldNotBeFound("description.doesNotContain=" + DEFAULT_DESCRIPTION);
+
+        // Get all the pointUsageConceptList where description does not contain UPDATED_DESCRIPTION
+        defaultPointUsageConceptShouldBeFound("description.doesNotContain=" + UPDATED_DESCRIPTION);
+    }
+
+    @Test
+    @Transactional
+    void getAllPointUsageConceptsByRequiredPointsIsEqualToSomething() throws Exception {
+        // Initialize the database
+        pointUsageConceptRepository.saveAndFlush(pointUsageConcept);
+
+        // Get all the pointUsageConceptList where requiredPoints equals to DEFAULT_REQUIRED_POINTS
+        defaultPointUsageConceptShouldBeFound("requiredPoints.equals=" + DEFAULT_REQUIRED_POINTS);
+
+        // Get all the pointUsageConceptList where requiredPoints equals to UPDATED_REQUIRED_POINTS
+        defaultPointUsageConceptShouldNotBeFound("requiredPoints.equals=" + UPDATED_REQUIRED_POINTS);
+    }
+
+    @Test
+    @Transactional
+    void getAllPointUsageConceptsByRequiredPointsIsNotEqualToSomething() throws Exception {
+        // Initialize the database
+        pointUsageConceptRepository.saveAndFlush(pointUsageConcept);
+
+        // Get all the pointUsageConceptList where requiredPoints not equals to DEFAULT_REQUIRED_POINTS
+        defaultPointUsageConceptShouldNotBeFound("requiredPoints.notEquals=" + DEFAULT_REQUIRED_POINTS);
+
+        // Get all the pointUsageConceptList where requiredPoints not equals to UPDATED_REQUIRED_POINTS
+        defaultPointUsageConceptShouldBeFound("requiredPoints.notEquals=" + UPDATED_REQUIRED_POINTS);
+    }
+
+    @Test
+    @Transactional
+    void getAllPointUsageConceptsByRequiredPointsIsInShouldWork() throws Exception {
+        // Initialize the database
+        pointUsageConceptRepository.saveAndFlush(pointUsageConcept);
+
+        // Get all the pointUsageConceptList where requiredPoints in DEFAULT_REQUIRED_POINTS or UPDATED_REQUIRED_POINTS
+        defaultPointUsageConceptShouldBeFound("requiredPoints.in=" + DEFAULT_REQUIRED_POINTS + "," + UPDATED_REQUIRED_POINTS);
+
+        // Get all the pointUsageConceptList where requiredPoints equals to UPDATED_REQUIRED_POINTS
+        defaultPointUsageConceptShouldNotBeFound("requiredPoints.in=" + UPDATED_REQUIRED_POINTS);
+    }
+
+    @Test
+    @Transactional
+    void getAllPointUsageConceptsByRequiredPointsIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        pointUsageConceptRepository.saveAndFlush(pointUsageConcept);
+
+        // Get all the pointUsageConceptList where requiredPoints is not null
+        defaultPointUsageConceptShouldBeFound("requiredPoints.specified=true");
+
+        // Get all the pointUsageConceptList where requiredPoints is null
+        defaultPointUsageConceptShouldNotBeFound("requiredPoints.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllPointUsageConceptsByRequiredPointsIsGreaterThanOrEqualToSomething() throws Exception {
+        // Initialize the database
+        pointUsageConceptRepository.saveAndFlush(pointUsageConcept);
+
+        // Get all the pointUsageConceptList where requiredPoints is greater than or equal to DEFAULT_REQUIRED_POINTS
+        defaultPointUsageConceptShouldBeFound("requiredPoints.greaterThanOrEqual=" + DEFAULT_REQUIRED_POINTS);
+
+        // Get all the pointUsageConceptList where requiredPoints is greater than or equal to UPDATED_REQUIRED_POINTS
+        defaultPointUsageConceptShouldNotBeFound("requiredPoints.greaterThanOrEqual=" + UPDATED_REQUIRED_POINTS);
+    }
+
+    @Test
+    @Transactional
+    void getAllPointUsageConceptsByRequiredPointsIsLessThanOrEqualToSomething() throws Exception {
+        // Initialize the database
+        pointUsageConceptRepository.saveAndFlush(pointUsageConcept);
+
+        // Get all the pointUsageConceptList where requiredPoints is less than or equal to DEFAULT_REQUIRED_POINTS
+        defaultPointUsageConceptShouldBeFound("requiredPoints.lessThanOrEqual=" + DEFAULT_REQUIRED_POINTS);
+
+        // Get all the pointUsageConceptList where requiredPoints is less than or equal to SMALLER_REQUIRED_POINTS
+        defaultPointUsageConceptShouldNotBeFound("requiredPoints.lessThanOrEqual=" + SMALLER_REQUIRED_POINTS);
+    }
+
+    @Test
+    @Transactional
+    void getAllPointUsageConceptsByRequiredPointsIsLessThanSomething() throws Exception {
+        // Initialize the database
+        pointUsageConceptRepository.saveAndFlush(pointUsageConcept);
+
+        // Get all the pointUsageConceptList where requiredPoints is less than DEFAULT_REQUIRED_POINTS
+        defaultPointUsageConceptShouldNotBeFound("requiredPoints.lessThan=" + DEFAULT_REQUIRED_POINTS);
+
+        // Get all the pointUsageConceptList where requiredPoints is less than UPDATED_REQUIRED_POINTS
+        defaultPointUsageConceptShouldBeFound("requiredPoints.lessThan=" + UPDATED_REQUIRED_POINTS);
+    }
+
+    @Test
+    @Transactional
+    void getAllPointUsageConceptsByRequiredPointsIsGreaterThanSomething() throws Exception {
+        // Initialize the database
+        pointUsageConceptRepository.saveAndFlush(pointUsageConcept);
+
+        // Get all the pointUsageConceptList where requiredPoints is greater than DEFAULT_REQUIRED_POINTS
+        defaultPointUsageConceptShouldNotBeFound("requiredPoints.greaterThan=" + DEFAULT_REQUIRED_POINTS);
+
+        // Get all the pointUsageConceptList where requiredPoints is greater than SMALLER_REQUIRED_POINTS
+        defaultPointUsageConceptShouldBeFound("requiredPoints.greaterThan=" + SMALLER_REQUIRED_POINTS);
+    }
+
+    @Test
+    @Transactional
+    void getAllPointUsageConceptsByPointUseIsEqualToSomething() throws Exception {
+        // Initialize the database
+        pointUsageConceptRepository.saveAndFlush(pointUsageConcept);
+        PointUse pointUse;
+        if (TestUtil.findAll(em, PointUse.class).isEmpty()) {
+            pointUse = PointUseResourceIT.createEntity(em);
+            em.persist(pointUse);
+            em.flush();
+        } else {
+            pointUse = TestUtil.findAll(em, PointUse.class).get(0);
+        }
+        em.persist(pointUse);
+        em.flush();
+        pointUsageConcept.addPointUse(pointUse);
+        pointUsageConceptRepository.saveAndFlush(pointUsageConcept);
+        Long pointUseId = pointUse.getId();
+
+        // Get all the pointUsageConceptList where pointUse equals to pointUseId
+        defaultPointUsageConceptShouldBeFound("pointUseId.equals=" + pointUseId);
+
+        // Get all the pointUsageConceptList where pointUse equals to (pointUseId + 1)
+        defaultPointUsageConceptShouldNotBeFound("pointUseId.equals=" + (pointUseId + 1));
+    }
+
+    /**
+     * Executes the search, and checks that the default entity is returned.
+     */
+    private void defaultPointUsageConceptShouldBeFound(String filter) throws Exception {
+        restPointUsageConceptMockMvc
+            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(jsonPath("$.[*].id").value(hasItem(pointUsageConcept.getId().intValue())))
+            .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION)))
+            .andExpect(jsonPath("$.[*].requiredPoints").value(hasItem(DEFAULT_REQUIRED_POINTS.intValue())));
+
+        // Check, that the count call also returns 1
+        restPointUsageConceptMockMvc
+            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(content().string("1"));
+    }
+
+    /**
+     * Executes the search, and checks that the default entity is not returned.
+     */
+    private void defaultPointUsageConceptShouldNotBeFound(String filter) throws Exception {
+        restPointUsageConceptMockMvc
+            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(jsonPath("$").isArray())
+            .andExpect(jsonPath("$").isEmpty());
+
+        // Check, that the count call also returns 0
+        restPointUsageConceptMockMvc
+            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(content().string("0"));
     }
 
     @Test

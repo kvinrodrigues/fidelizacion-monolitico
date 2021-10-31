@@ -2,7 +2,9 @@ package com.mycompany.myapp.web.rest;
 
 import com.mycompany.myapp.domain.PointUseDet;
 import com.mycompany.myapp.repository.PointUseDetRepository;
+import com.mycompany.myapp.service.PointUseDetQueryService;
 import com.mycompany.myapp.service.PointUseDetService;
+import com.mycompany.myapp.service.criteria.PointUseDetCriteria;
 import com.mycompany.myapp.web.rest.errors.BadRequestAlertException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -37,9 +39,16 @@ public class PointUseDetResource {
 
     private final PointUseDetRepository pointUseDetRepository;
 
-    public PointUseDetResource(PointUseDetService pointUseDetService, PointUseDetRepository pointUseDetRepository) {
+    private final PointUseDetQueryService pointUseDetQueryService;
+
+    public PointUseDetResource(
+        PointUseDetService pointUseDetService,
+        PointUseDetRepository pointUseDetRepository,
+        PointUseDetQueryService pointUseDetQueryService
+    ) {
         this.pointUseDetService = pointUseDetService;
         this.pointUseDetRepository = pointUseDetRepository;
+        this.pointUseDetQueryService = pointUseDetQueryService;
     }
 
     /**
@@ -135,12 +144,26 @@ public class PointUseDetResource {
     /**
      * {@code GET  /point-use-dets} : get all the pointUseDets.
      *
+     * @param criteria the criteria which the requested entities should match.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of pointUseDets in body.
      */
     @GetMapping("/point-use-dets")
-    public List<PointUseDet> getAllPointUseDets() {
-        log.debug("REST request to get all PointUseDets");
-        return pointUseDetService.findAll();
+    public ResponseEntity<List<PointUseDet>> getAllPointUseDets(PointUseDetCriteria criteria) {
+        log.debug("REST request to get PointUseDets by criteria: {}", criteria);
+        List<PointUseDet> entityList = pointUseDetQueryService.findByCriteria(criteria);
+        return ResponseEntity.ok().body(entityList);
+    }
+
+    /**
+     * {@code GET  /point-use-dets/count} : count all the pointUseDets.
+     *
+     * @param criteria the criteria which the requested entities should match.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count in body.
+     */
+    @GetMapping("/point-use-dets/count")
+    public ResponseEntity<Long> countPointUseDets(PointUseDetCriteria criteria) {
+        log.debug("REST request to count PointUseDets by criteria: {}", criteria);
+        return ResponseEntity.ok().body(pointUseDetQueryService.countByCriteria(criteria));
     }
 
     /**

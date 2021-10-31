@@ -6,8 +6,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.mycompany.myapp.IntegrationTest;
+import com.mycompany.myapp.domain.BagOfPoint;
 import com.mycompany.myapp.domain.Client;
+import com.mycompany.myapp.domain.DocumentType;
+import com.mycompany.myapp.domain.Nacionality;
 import com.mycompany.myapp.repository.ClientRepository;
+import com.mycompany.myapp.service.criteria.ClientCriteria;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -284,6 +288,587 @@ class ClientResourceIT {
             .andExpect(jsonPath("$.email").value(DEFAULT_EMAIL))
             .andExpect(jsonPath("$.phoneNumber").value(DEFAULT_PHONE_NUMBER))
             .andExpect(jsonPath("$.birthDate").value(DEFAULT_BIRTH_DATE.toString()));
+    }
+
+    @Test
+    @Transactional
+    void getClientsByIdFiltering() throws Exception {
+        // Initialize the database
+        clientRepository.saveAndFlush(client);
+
+        Long id = client.getId();
+
+        defaultClientShouldBeFound("id.equals=" + id);
+        defaultClientShouldNotBeFound("id.notEquals=" + id);
+
+        defaultClientShouldBeFound("id.greaterThanOrEqual=" + id);
+        defaultClientShouldNotBeFound("id.greaterThan=" + id);
+
+        defaultClientShouldBeFound("id.lessThanOrEqual=" + id);
+        defaultClientShouldNotBeFound("id.lessThan=" + id);
+    }
+
+    @Test
+    @Transactional
+    void getAllClientsByNameIsEqualToSomething() throws Exception {
+        // Initialize the database
+        clientRepository.saveAndFlush(client);
+
+        // Get all the clientList where name equals to DEFAULT_NAME
+        defaultClientShouldBeFound("name.equals=" + DEFAULT_NAME);
+
+        // Get all the clientList where name equals to UPDATED_NAME
+        defaultClientShouldNotBeFound("name.equals=" + UPDATED_NAME);
+    }
+
+    @Test
+    @Transactional
+    void getAllClientsByNameIsNotEqualToSomething() throws Exception {
+        // Initialize the database
+        clientRepository.saveAndFlush(client);
+
+        // Get all the clientList where name not equals to DEFAULT_NAME
+        defaultClientShouldNotBeFound("name.notEquals=" + DEFAULT_NAME);
+
+        // Get all the clientList where name not equals to UPDATED_NAME
+        defaultClientShouldBeFound("name.notEquals=" + UPDATED_NAME);
+    }
+
+    @Test
+    @Transactional
+    void getAllClientsByNameIsInShouldWork() throws Exception {
+        // Initialize the database
+        clientRepository.saveAndFlush(client);
+
+        // Get all the clientList where name in DEFAULT_NAME or UPDATED_NAME
+        defaultClientShouldBeFound("name.in=" + DEFAULT_NAME + "," + UPDATED_NAME);
+
+        // Get all the clientList where name equals to UPDATED_NAME
+        defaultClientShouldNotBeFound("name.in=" + UPDATED_NAME);
+    }
+
+    @Test
+    @Transactional
+    void getAllClientsByNameIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        clientRepository.saveAndFlush(client);
+
+        // Get all the clientList where name is not null
+        defaultClientShouldBeFound("name.specified=true");
+
+        // Get all the clientList where name is null
+        defaultClientShouldNotBeFound("name.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllClientsByNameContainsSomething() throws Exception {
+        // Initialize the database
+        clientRepository.saveAndFlush(client);
+
+        // Get all the clientList where name contains DEFAULT_NAME
+        defaultClientShouldBeFound("name.contains=" + DEFAULT_NAME);
+
+        // Get all the clientList where name contains UPDATED_NAME
+        defaultClientShouldNotBeFound("name.contains=" + UPDATED_NAME);
+    }
+
+    @Test
+    @Transactional
+    void getAllClientsByNameNotContainsSomething() throws Exception {
+        // Initialize the database
+        clientRepository.saveAndFlush(client);
+
+        // Get all the clientList where name does not contain DEFAULT_NAME
+        defaultClientShouldNotBeFound("name.doesNotContain=" + DEFAULT_NAME);
+
+        // Get all the clientList where name does not contain UPDATED_NAME
+        defaultClientShouldBeFound("name.doesNotContain=" + UPDATED_NAME);
+    }
+
+    @Test
+    @Transactional
+    void getAllClientsByLastNameIsEqualToSomething() throws Exception {
+        // Initialize the database
+        clientRepository.saveAndFlush(client);
+
+        // Get all the clientList where lastName equals to DEFAULT_LAST_NAME
+        defaultClientShouldBeFound("lastName.equals=" + DEFAULT_LAST_NAME);
+
+        // Get all the clientList where lastName equals to UPDATED_LAST_NAME
+        defaultClientShouldNotBeFound("lastName.equals=" + UPDATED_LAST_NAME);
+    }
+
+    @Test
+    @Transactional
+    void getAllClientsByLastNameIsNotEqualToSomething() throws Exception {
+        // Initialize the database
+        clientRepository.saveAndFlush(client);
+
+        // Get all the clientList where lastName not equals to DEFAULT_LAST_NAME
+        defaultClientShouldNotBeFound("lastName.notEquals=" + DEFAULT_LAST_NAME);
+
+        // Get all the clientList where lastName not equals to UPDATED_LAST_NAME
+        defaultClientShouldBeFound("lastName.notEquals=" + UPDATED_LAST_NAME);
+    }
+
+    @Test
+    @Transactional
+    void getAllClientsByLastNameIsInShouldWork() throws Exception {
+        // Initialize the database
+        clientRepository.saveAndFlush(client);
+
+        // Get all the clientList where lastName in DEFAULT_LAST_NAME or UPDATED_LAST_NAME
+        defaultClientShouldBeFound("lastName.in=" + DEFAULT_LAST_NAME + "," + UPDATED_LAST_NAME);
+
+        // Get all the clientList where lastName equals to UPDATED_LAST_NAME
+        defaultClientShouldNotBeFound("lastName.in=" + UPDATED_LAST_NAME);
+    }
+
+    @Test
+    @Transactional
+    void getAllClientsByLastNameIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        clientRepository.saveAndFlush(client);
+
+        // Get all the clientList where lastName is not null
+        defaultClientShouldBeFound("lastName.specified=true");
+
+        // Get all the clientList where lastName is null
+        defaultClientShouldNotBeFound("lastName.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllClientsByLastNameContainsSomething() throws Exception {
+        // Initialize the database
+        clientRepository.saveAndFlush(client);
+
+        // Get all the clientList where lastName contains DEFAULT_LAST_NAME
+        defaultClientShouldBeFound("lastName.contains=" + DEFAULT_LAST_NAME);
+
+        // Get all the clientList where lastName contains UPDATED_LAST_NAME
+        defaultClientShouldNotBeFound("lastName.contains=" + UPDATED_LAST_NAME);
+    }
+
+    @Test
+    @Transactional
+    void getAllClientsByLastNameNotContainsSomething() throws Exception {
+        // Initialize the database
+        clientRepository.saveAndFlush(client);
+
+        // Get all the clientList where lastName does not contain DEFAULT_LAST_NAME
+        defaultClientShouldNotBeFound("lastName.doesNotContain=" + DEFAULT_LAST_NAME);
+
+        // Get all the clientList where lastName does not contain UPDATED_LAST_NAME
+        defaultClientShouldBeFound("lastName.doesNotContain=" + UPDATED_LAST_NAME);
+    }
+
+    @Test
+    @Transactional
+    void getAllClientsByDocumentNumberIsEqualToSomething() throws Exception {
+        // Initialize the database
+        clientRepository.saveAndFlush(client);
+
+        // Get all the clientList where documentNumber equals to DEFAULT_DOCUMENT_NUMBER
+        defaultClientShouldBeFound("documentNumber.equals=" + DEFAULT_DOCUMENT_NUMBER);
+
+        // Get all the clientList where documentNumber equals to UPDATED_DOCUMENT_NUMBER
+        defaultClientShouldNotBeFound("documentNumber.equals=" + UPDATED_DOCUMENT_NUMBER);
+    }
+
+    @Test
+    @Transactional
+    void getAllClientsByDocumentNumberIsNotEqualToSomething() throws Exception {
+        // Initialize the database
+        clientRepository.saveAndFlush(client);
+
+        // Get all the clientList where documentNumber not equals to DEFAULT_DOCUMENT_NUMBER
+        defaultClientShouldNotBeFound("documentNumber.notEquals=" + DEFAULT_DOCUMENT_NUMBER);
+
+        // Get all the clientList where documentNumber not equals to UPDATED_DOCUMENT_NUMBER
+        defaultClientShouldBeFound("documentNumber.notEquals=" + UPDATED_DOCUMENT_NUMBER);
+    }
+
+    @Test
+    @Transactional
+    void getAllClientsByDocumentNumberIsInShouldWork() throws Exception {
+        // Initialize the database
+        clientRepository.saveAndFlush(client);
+
+        // Get all the clientList where documentNumber in DEFAULT_DOCUMENT_NUMBER or UPDATED_DOCUMENT_NUMBER
+        defaultClientShouldBeFound("documentNumber.in=" + DEFAULT_DOCUMENT_NUMBER + "," + UPDATED_DOCUMENT_NUMBER);
+
+        // Get all the clientList where documentNumber equals to UPDATED_DOCUMENT_NUMBER
+        defaultClientShouldNotBeFound("documentNumber.in=" + UPDATED_DOCUMENT_NUMBER);
+    }
+
+    @Test
+    @Transactional
+    void getAllClientsByDocumentNumberIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        clientRepository.saveAndFlush(client);
+
+        // Get all the clientList where documentNumber is not null
+        defaultClientShouldBeFound("documentNumber.specified=true");
+
+        // Get all the clientList where documentNumber is null
+        defaultClientShouldNotBeFound("documentNumber.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllClientsByDocumentNumberContainsSomething() throws Exception {
+        // Initialize the database
+        clientRepository.saveAndFlush(client);
+
+        // Get all the clientList where documentNumber contains DEFAULT_DOCUMENT_NUMBER
+        defaultClientShouldBeFound("documentNumber.contains=" + DEFAULT_DOCUMENT_NUMBER);
+
+        // Get all the clientList where documentNumber contains UPDATED_DOCUMENT_NUMBER
+        defaultClientShouldNotBeFound("documentNumber.contains=" + UPDATED_DOCUMENT_NUMBER);
+    }
+
+    @Test
+    @Transactional
+    void getAllClientsByDocumentNumberNotContainsSomething() throws Exception {
+        // Initialize the database
+        clientRepository.saveAndFlush(client);
+
+        // Get all the clientList where documentNumber does not contain DEFAULT_DOCUMENT_NUMBER
+        defaultClientShouldNotBeFound("documentNumber.doesNotContain=" + DEFAULT_DOCUMENT_NUMBER);
+
+        // Get all the clientList where documentNumber does not contain UPDATED_DOCUMENT_NUMBER
+        defaultClientShouldBeFound("documentNumber.doesNotContain=" + UPDATED_DOCUMENT_NUMBER);
+    }
+
+    @Test
+    @Transactional
+    void getAllClientsByEmailIsEqualToSomething() throws Exception {
+        // Initialize the database
+        clientRepository.saveAndFlush(client);
+
+        // Get all the clientList where email equals to DEFAULT_EMAIL
+        defaultClientShouldBeFound("email.equals=" + DEFAULT_EMAIL);
+
+        // Get all the clientList where email equals to UPDATED_EMAIL
+        defaultClientShouldNotBeFound("email.equals=" + UPDATED_EMAIL);
+    }
+
+    @Test
+    @Transactional
+    void getAllClientsByEmailIsNotEqualToSomething() throws Exception {
+        // Initialize the database
+        clientRepository.saveAndFlush(client);
+
+        // Get all the clientList where email not equals to DEFAULT_EMAIL
+        defaultClientShouldNotBeFound("email.notEquals=" + DEFAULT_EMAIL);
+
+        // Get all the clientList where email not equals to UPDATED_EMAIL
+        defaultClientShouldBeFound("email.notEquals=" + UPDATED_EMAIL);
+    }
+
+    @Test
+    @Transactional
+    void getAllClientsByEmailIsInShouldWork() throws Exception {
+        // Initialize the database
+        clientRepository.saveAndFlush(client);
+
+        // Get all the clientList where email in DEFAULT_EMAIL or UPDATED_EMAIL
+        defaultClientShouldBeFound("email.in=" + DEFAULT_EMAIL + "," + UPDATED_EMAIL);
+
+        // Get all the clientList where email equals to UPDATED_EMAIL
+        defaultClientShouldNotBeFound("email.in=" + UPDATED_EMAIL);
+    }
+
+    @Test
+    @Transactional
+    void getAllClientsByEmailIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        clientRepository.saveAndFlush(client);
+
+        // Get all the clientList where email is not null
+        defaultClientShouldBeFound("email.specified=true");
+
+        // Get all the clientList where email is null
+        defaultClientShouldNotBeFound("email.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllClientsByEmailContainsSomething() throws Exception {
+        // Initialize the database
+        clientRepository.saveAndFlush(client);
+
+        // Get all the clientList where email contains DEFAULT_EMAIL
+        defaultClientShouldBeFound("email.contains=" + DEFAULT_EMAIL);
+
+        // Get all the clientList where email contains UPDATED_EMAIL
+        defaultClientShouldNotBeFound("email.contains=" + UPDATED_EMAIL);
+    }
+
+    @Test
+    @Transactional
+    void getAllClientsByEmailNotContainsSomething() throws Exception {
+        // Initialize the database
+        clientRepository.saveAndFlush(client);
+
+        // Get all the clientList where email does not contain DEFAULT_EMAIL
+        defaultClientShouldNotBeFound("email.doesNotContain=" + DEFAULT_EMAIL);
+
+        // Get all the clientList where email does not contain UPDATED_EMAIL
+        defaultClientShouldBeFound("email.doesNotContain=" + UPDATED_EMAIL);
+    }
+
+    @Test
+    @Transactional
+    void getAllClientsByPhoneNumberIsEqualToSomething() throws Exception {
+        // Initialize the database
+        clientRepository.saveAndFlush(client);
+
+        // Get all the clientList where phoneNumber equals to DEFAULT_PHONE_NUMBER
+        defaultClientShouldBeFound("phoneNumber.equals=" + DEFAULT_PHONE_NUMBER);
+
+        // Get all the clientList where phoneNumber equals to UPDATED_PHONE_NUMBER
+        defaultClientShouldNotBeFound("phoneNumber.equals=" + UPDATED_PHONE_NUMBER);
+    }
+
+    @Test
+    @Transactional
+    void getAllClientsByPhoneNumberIsNotEqualToSomething() throws Exception {
+        // Initialize the database
+        clientRepository.saveAndFlush(client);
+
+        // Get all the clientList where phoneNumber not equals to DEFAULT_PHONE_NUMBER
+        defaultClientShouldNotBeFound("phoneNumber.notEquals=" + DEFAULT_PHONE_NUMBER);
+
+        // Get all the clientList where phoneNumber not equals to UPDATED_PHONE_NUMBER
+        defaultClientShouldBeFound("phoneNumber.notEquals=" + UPDATED_PHONE_NUMBER);
+    }
+
+    @Test
+    @Transactional
+    void getAllClientsByPhoneNumberIsInShouldWork() throws Exception {
+        // Initialize the database
+        clientRepository.saveAndFlush(client);
+
+        // Get all the clientList where phoneNumber in DEFAULT_PHONE_NUMBER or UPDATED_PHONE_NUMBER
+        defaultClientShouldBeFound("phoneNumber.in=" + DEFAULT_PHONE_NUMBER + "," + UPDATED_PHONE_NUMBER);
+
+        // Get all the clientList where phoneNumber equals to UPDATED_PHONE_NUMBER
+        defaultClientShouldNotBeFound("phoneNumber.in=" + UPDATED_PHONE_NUMBER);
+    }
+
+    @Test
+    @Transactional
+    void getAllClientsByPhoneNumberIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        clientRepository.saveAndFlush(client);
+
+        // Get all the clientList where phoneNumber is not null
+        defaultClientShouldBeFound("phoneNumber.specified=true");
+
+        // Get all the clientList where phoneNumber is null
+        defaultClientShouldNotBeFound("phoneNumber.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllClientsByPhoneNumberContainsSomething() throws Exception {
+        // Initialize the database
+        clientRepository.saveAndFlush(client);
+
+        // Get all the clientList where phoneNumber contains DEFAULT_PHONE_NUMBER
+        defaultClientShouldBeFound("phoneNumber.contains=" + DEFAULT_PHONE_NUMBER);
+
+        // Get all the clientList where phoneNumber contains UPDATED_PHONE_NUMBER
+        defaultClientShouldNotBeFound("phoneNumber.contains=" + UPDATED_PHONE_NUMBER);
+    }
+
+    @Test
+    @Transactional
+    void getAllClientsByPhoneNumberNotContainsSomething() throws Exception {
+        // Initialize the database
+        clientRepository.saveAndFlush(client);
+
+        // Get all the clientList where phoneNumber does not contain DEFAULT_PHONE_NUMBER
+        defaultClientShouldNotBeFound("phoneNumber.doesNotContain=" + DEFAULT_PHONE_NUMBER);
+
+        // Get all the clientList where phoneNumber does not contain UPDATED_PHONE_NUMBER
+        defaultClientShouldBeFound("phoneNumber.doesNotContain=" + UPDATED_PHONE_NUMBER);
+    }
+
+    @Test
+    @Transactional
+    void getAllClientsByBirthDateIsEqualToSomething() throws Exception {
+        // Initialize the database
+        clientRepository.saveAndFlush(client);
+
+        // Get all the clientList where birthDate equals to DEFAULT_BIRTH_DATE
+        defaultClientShouldBeFound("birthDate.equals=" + DEFAULT_BIRTH_DATE);
+
+        // Get all the clientList where birthDate equals to UPDATED_BIRTH_DATE
+        defaultClientShouldNotBeFound("birthDate.equals=" + UPDATED_BIRTH_DATE);
+    }
+
+    @Test
+    @Transactional
+    void getAllClientsByBirthDateIsNotEqualToSomething() throws Exception {
+        // Initialize the database
+        clientRepository.saveAndFlush(client);
+
+        // Get all the clientList where birthDate not equals to DEFAULT_BIRTH_DATE
+        defaultClientShouldNotBeFound("birthDate.notEquals=" + DEFAULT_BIRTH_DATE);
+
+        // Get all the clientList where birthDate not equals to UPDATED_BIRTH_DATE
+        defaultClientShouldBeFound("birthDate.notEquals=" + UPDATED_BIRTH_DATE);
+    }
+
+    @Test
+    @Transactional
+    void getAllClientsByBirthDateIsInShouldWork() throws Exception {
+        // Initialize the database
+        clientRepository.saveAndFlush(client);
+
+        // Get all the clientList where birthDate in DEFAULT_BIRTH_DATE or UPDATED_BIRTH_DATE
+        defaultClientShouldBeFound("birthDate.in=" + DEFAULT_BIRTH_DATE + "," + UPDATED_BIRTH_DATE);
+
+        // Get all the clientList where birthDate equals to UPDATED_BIRTH_DATE
+        defaultClientShouldNotBeFound("birthDate.in=" + UPDATED_BIRTH_DATE);
+    }
+
+    @Test
+    @Transactional
+    void getAllClientsByBirthDateIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        clientRepository.saveAndFlush(client);
+
+        // Get all the clientList where birthDate is not null
+        defaultClientShouldBeFound("birthDate.specified=true");
+
+        // Get all the clientList where birthDate is null
+        defaultClientShouldNotBeFound("birthDate.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllClientsByDocumentTypeIsEqualToSomething() throws Exception {
+        // Initialize the database
+        clientRepository.saveAndFlush(client);
+        DocumentType documentType;
+        if (TestUtil.findAll(em, DocumentType.class).isEmpty()) {
+            documentType = DocumentTypeResourceIT.createEntity(em);
+            em.persist(documentType);
+            em.flush();
+        } else {
+            documentType = TestUtil.findAll(em, DocumentType.class).get(0);
+        }
+        em.persist(documentType);
+        em.flush();
+        client.setDocumentType(documentType);
+        clientRepository.saveAndFlush(client);
+        Long documentTypeId = documentType.getId();
+
+        // Get all the clientList where documentType equals to documentTypeId
+        defaultClientShouldBeFound("documentTypeId.equals=" + documentTypeId);
+
+        // Get all the clientList where documentType equals to (documentTypeId + 1)
+        defaultClientShouldNotBeFound("documentTypeId.equals=" + (documentTypeId + 1));
+    }
+
+    @Test
+    @Transactional
+    void getAllClientsByNacionalityIsEqualToSomething() throws Exception {
+        // Initialize the database
+        clientRepository.saveAndFlush(client);
+        Nacionality nacionality;
+        if (TestUtil.findAll(em, Nacionality.class).isEmpty()) {
+            nacionality = NacionalityResourceIT.createEntity(em);
+            em.persist(nacionality);
+            em.flush();
+        } else {
+            nacionality = TestUtil.findAll(em, Nacionality.class).get(0);
+        }
+        em.persist(nacionality);
+        em.flush();
+        client.setNacionality(nacionality);
+        clientRepository.saveAndFlush(client);
+        Long nacionalityId = nacionality.getId();
+
+        // Get all the clientList where nacionality equals to nacionalityId
+        defaultClientShouldBeFound("nacionalityId.equals=" + nacionalityId);
+
+        // Get all the clientList where nacionality equals to (nacionalityId + 1)
+        defaultClientShouldNotBeFound("nacionalityId.equals=" + (nacionalityId + 1));
+    }
+
+    @Test
+    @Transactional
+    void getAllClientsByBagOfPointIsEqualToSomething() throws Exception {
+        // Initialize the database
+        clientRepository.saveAndFlush(client);
+        BagOfPoint bagOfPoint;
+        if (TestUtil.findAll(em, BagOfPoint.class).isEmpty()) {
+            bagOfPoint = BagOfPointResourceIT.createEntity(em);
+            em.persist(bagOfPoint);
+            em.flush();
+        } else {
+            bagOfPoint = TestUtil.findAll(em, BagOfPoint.class).get(0);
+        }
+        em.persist(bagOfPoint);
+        em.flush();
+        client.setBagOfPoint(bagOfPoint);
+        clientRepository.saveAndFlush(client);
+        Long bagOfPointId = bagOfPoint.getId();
+
+        // Get all the clientList where bagOfPoint equals to bagOfPointId
+        defaultClientShouldBeFound("bagOfPointId.equals=" + bagOfPointId);
+
+        // Get all the clientList where bagOfPoint equals to (bagOfPointId + 1)
+        defaultClientShouldNotBeFound("bagOfPointId.equals=" + (bagOfPointId + 1));
+    }
+
+    /**
+     * Executes the search, and checks that the default entity is returned.
+     */
+    private void defaultClientShouldBeFound(String filter) throws Exception {
+        restClientMockMvc
+            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(jsonPath("$.[*].id").value(hasItem(client.getId().intValue())))
+            .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
+            .andExpect(jsonPath("$.[*].lastName").value(hasItem(DEFAULT_LAST_NAME)))
+            .andExpect(jsonPath("$.[*].documentNumber").value(hasItem(DEFAULT_DOCUMENT_NUMBER)))
+            .andExpect(jsonPath("$.[*].email").value(hasItem(DEFAULT_EMAIL)))
+            .andExpect(jsonPath("$.[*].phoneNumber").value(hasItem(DEFAULT_PHONE_NUMBER)))
+            .andExpect(jsonPath("$.[*].birthDate").value(hasItem(DEFAULT_BIRTH_DATE.toString())));
+
+        // Check, that the count call also returns 1
+        restClientMockMvc
+            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(content().string("1"));
+    }
+
+    /**
+     * Executes the search, and checks that the default entity is not returned.
+     */
+    private void defaultClientShouldNotBeFound(String filter) throws Exception {
+        restClientMockMvc
+            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(jsonPath("$").isArray())
+            .andExpect(jsonPath("$").isEmpty());
+
+        // Check, that the count call also returns 0
+        restClientMockMvc
+            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(content().string("0"));
     }
 
     @Test

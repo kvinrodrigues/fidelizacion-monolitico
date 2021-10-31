@@ -6,8 +6,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.mycompany.myapp.IntegrationTest;
+import com.mycompany.myapp.domain.Client;
 import com.mycompany.myapp.domain.DocumentType;
 import com.mycompany.myapp.repository.DocumentTypeRepository;
+import com.mycompany.myapp.service.criteria.DocumentTypeCriteria;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
@@ -178,6 +180,245 @@ class DocumentTypeResourceIT {
             .andExpect(jsonPath("$.id").value(documentType.getId().intValue()))
             .andExpect(jsonPath("$.name").value(DEFAULT_NAME))
             .andExpect(jsonPath("$.description").value(DEFAULT_DESCRIPTION));
+    }
+
+    @Test
+    @Transactional
+    void getDocumentTypesByIdFiltering() throws Exception {
+        // Initialize the database
+        documentTypeRepository.saveAndFlush(documentType);
+
+        Long id = documentType.getId();
+
+        defaultDocumentTypeShouldBeFound("id.equals=" + id);
+        defaultDocumentTypeShouldNotBeFound("id.notEquals=" + id);
+
+        defaultDocumentTypeShouldBeFound("id.greaterThanOrEqual=" + id);
+        defaultDocumentTypeShouldNotBeFound("id.greaterThan=" + id);
+
+        defaultDocumentTypeShouldBeFound("id.lessThanOrEqual=" + id);
+        defaultDocumentTypeShouldNotBeFound("id.lessThan=" + id);
+    }
+
+    @Test
+    @Transactional
+    void getAllDocumentTypesByNameIsEqualToSomething() throws Exception {
+        // Initialize the database
+        documentTypeRepository.saveAndFlush(documentType);
+
+        // Get all the documentTypeList where name equals to DEFAULT_NAME
+        defaultDocumentTypeShouldBeFound("name.equals=" + DEFAULT_NAME);
+
+        // Get all the documentTypeList where name equals to UPDATED_NAME
+        defaultDocumentTypeShouldNotBeFound("name.equals=" + UPDATED_NAME);
+    }
+
+    @Test
+    @Transactional
+    void getAllDocumentTypesByNameIsNotEqualToSomething() throws Exception {
+        // Initialize the database
+        documentTypeRepository.saveAndFlush(documentType);
+
+        // Get all the documentTypeList where name not equals to DEFAULT_NAME
+        defaultDocumentTypeShouldNotBeFound("name.notEquals=" + DEFAULT_NAME);
+
+        // Get all the documentTypeList where name not equals to UPDATED_NAME
+        defaultDocumentTypeShouldBeFound("name.notEquals=" + UPDATED_NAME);
+    }
+
+    @Test
+    @Transactional
+    void getAllDocumentTypesByNameIsInShouldWork() throws Exception {
+        // Initialize the database
+        documentTypeRepository.saveAndFlush(documentType);
+
+        // Get all the documentTypeList where name in DEFAULT_NAME or UPDATED_NAME
+        defaultDocumentTypeShouldBeFound("name.in=" + DEFAULT_NAME + "," + UPDATED_NAME);
+
+        // Get all the documentTypeList where name equals to UPDATED_NAME
+        defaultDocumentTypeShouldNotBeFound("name.in=" + UPDATED_NAME);
+    }
+
+    @Test
+    @Transactional
+    void getAllDocumentTypesByNameIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        documentTypeRepository.saveAndFlush(documentType);
+
+        // Get all the documentTypeList where name is not null
+        defaultDocumentTypeShouldBeFound("name.specified=true");
+
+        // Get all the documentTypeList where name is null
+        defaultDocumentTypeShouldNotBeFound("name.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllDocumentTypesByNameContainsSomething() throws Exception {
+        // Initialize the database
+        documentTypeRepository.saveAndFlush(documentType);
+
+        // Get all the documentTypeList where name contains DEFAULT_NAME
+        defaultDocumentTypeShouldBeFound("name.contains=" + DEFAULT_NAME);
+
+        // Get all the documentTypeList where name contains UPDATED_NAME
+        defaultDocumentTypeShouldNotBeFound("name.contains=" + UPDATED_NAME);
+    }
+
+    @Test
+    @Transactional
+    void getAllDocumentTypesByNameNotContainsSomething() throws Exception {
+        // Initialize the database
+        documentTypeRepository.saveAndFlush(documentType);
+
+        // Get all the documentTypeList where name does not contain DEFAULT_NAME
+        defaultDocumentTypeShouldNotBeFound("name.doesNotContain=" + DEFAULT_NAME);
+
+        // Get all the documentTypeList where name does not contain UPDATED_NAME
+        defaultDocumentTypeShouldBeFound("name.doesNotContain=" + UPDATED_NAME);
+    }
+
+    @Test
+    @Transactional
+    void getAllDocumentTypesByDescriptionIsEqualToSomething() throws Exception {
+        // Initialize the database
+        documentTypeRepository.saveAndFlush(documentType);
+
+        // Get all the documentTypeList where description equals to DEFAULT_DESCRIPTION
+        defaultDocumentTypeShouldBeFound("description.equals=" + DEFAULT_DESCRIPTION);
+
+        // Get all the documentTypeList where description equals to UPDATED_DESCRIPTION
+        defaultDocumentTypeShouldNotBeFound("description.equals=" + UPDATED_DESCRIPTION);
+    }
+
+    @Test
+    @Transactional
+    void getAllDocumentTypesByDescriptionIsNotEqualToSomething() throws Exception {
+        // Initialize the database
+        documentTypeRepository.saveAndFlush(documentType);
+
+        // Get all the documentTypeList where description not equals to DEFAULT_DESCRIPTION
+        defaultDocumentTypeShouldNotBeFound("description.notEquals=" + DEFAULT_DESCRIPTION);
+
+        // Get all the documentTypeList where description not equals to UPDATED_DESCRIPTION
+        defaultDocumentTypeShouldBeFound("description.notEquals=" + UPDATED_DESCRIPTION);
+    }
+
+    @Test
+    @Transactional
+    void getAllDocumentTypesByDescriptionIsInShouldWork() throws Exception {
+        // Initialize the database
+        documentTypeRepository.saveAndFlush(documentType);
+
+        // Get all the documentTypeList where description in DEFAULT_DESCRIPTION or UPDATED_DESCRIPTION
+        defaultDocumentTypeShouldBeFound("description.in=" + DEFAULT_DESCRIPTION + "," + UPDATED_DESCRIPTION);
+
+        // Get all the documentTypeList where description equals to UPDATED_DESCRIPTION
+        defaultDocumentTypeShouldNotBeFound("description.in=" + UPDATED_DESCRIPTION);
+    }
+
+    @Test
+    @Transactional
+    void getAllDocumentTypesByDescriptionIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        documentTypeRepository.saveAndFlush(documentType);
+
+        // Get all the documentTypeList where description is not null
+        defaultDocumentTypeShouldBeFound("description.specified=true");
+
+        // Get all the documentTypeList where description is null
+        defaultDocumentTypeShouldNotBeFound("description.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllDocumentTypesByDescriptionContainsSomething() throws Exception {
+        // Initialize the database
+        documentTypeRepository.saveAndFlush(documentType);
+
+        // Get all the documentTypeList where description contains DEFAULT_DESCRIPTION
+        defaultDocumentTypeShouldBeFound("description.contains=" + DEFAULT_DESCRIPTION);
+
+        // Get all the documentTypeList where description contains UPDATED_DESCRIPTION
+        defaultDocumentTypeShouldNotBeFound("description.contains=" + UPDATED_DESCRIPTION);
+    }
+
+    @Test
+    @Transactional
+    void getAllDocumentTypesByDescriptionNotContainsSomething() throws Exception {
+        // Initialize the database
+        documentTypeRepository.saveAndFlush(documentType);
+
+        // Get all the documentTypeList where description does not contain DEFAULT_DESCRIPTION
+        defaultDocumentTypeShouldNotBeFound("description.doesNotContain=" + DEFAULT_DESCRIPTION);
+
+        // Get all the documentTypeList where description does not contain UPDATED_DESCRIPTION
+        defaultDocumentTypeShouldBeFound("description.doesNotContain=" + UPDATED_DESCRIPTION);
+    }
+
+    @Test
+    @Transactional
+    void getAllDocumentTypesByClientIsEqualToSomething() throws Exception {
+        // Initialize the database
+        documentTypeRepository.saveAndFlush(documentType);
+        Client client;
+        if (TestUtil.findAll(em, Client.class).isEmpty()) {
+            client = ClientResourceIT.createEntity(em);
+            em.persist(client);
+            em.flush();
+        } else {
+            client = TestUtil.findAll(em, Client.class).get(0);
+        }
+        em.persist(client);
+        em.flush();
+        documentType.addClient(client);
+        documentTypeRepository.saveAndFlush(documentType);
+        Long clientId = client.getId();
+
+        // Get all the documentTypeList where client equals to clientId
+        defaultDocumentTypeShouldBeFound("clientId.equals=" + clientId);
+
+        // Get all the documentTypeList where client equals to (clientId + 1)
+        defaultDocumentTypeShouldNotBeFound("clientId.equals=" + (clientId + 1));
+    }
+
+    /**
+     * Executes the search, and checks that the default entity is returned.
+     */
+    private void defaultDocumentTypeShouldBeFound(String filter) throws Exception {
+        restDocumentTypeMockMvc
+            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(jsonPath("$.[*].id").value(hasItem(documentType.getId().intValue())))
+            .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
+            .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION)));
+
+        // Check, that the count call also returns 1
+        restDocumentTypeMockMvc
+            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(content().string("1"));
+    }
+
+    /**
+     * Executes the search, and checks that the default entity is not returned.
+     */
+    private void defaultDocumentTypeShouldNotBeFound(String filter) throws Exception {
+        restDocumentTypeMockMvc
+            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(jsonPath("$").isArray())
+            .andExpect(jsonPath("$").isEmpty());
+
+        // Check, that the count call also returns 0
+        restDocumentTypeMockMvc
+            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(content().string("0"));
     }
 
     @Test

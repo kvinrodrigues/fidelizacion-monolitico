@@ -2,7 +2,9 @@ package com.mycompany.myapp.web.rest;
 
 import com.mycompany.myapp.domain.ExpirationPoint;
 import com.mycompany.myapp.repository.ExpirationPointRepository;
+import com.mycompany.myapp.service.ExpirationPointQueryService;
 import com.mycompany.myapp.service.ExpirationPointService;
+import com.mycompany.myapp.service.criteria.ExpirationPointCriteria;
 import com.mycompany.myapp.web.rest.errors.BadRequestAlertException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -37,9 +39,16 @@ public class ExpirationPointResource {
 
     private final ExpirationPointRepository expirationPointRepository;
 
-    public ExpirationPointResource(ExpirationPointService expirationPointService, ExpirationPointRepository expirationPointRepository) {
+    private final ExpirationPointQueryService expirationPointQueryService;
+
+    public ExpirationPointResource(
+        ExpirationPointService expirationPointService,
+        ExpirationPointRepository expirationPointRepository,
+        ExpirationPointQueryService expirationPointQueryService
+    ) {
         this.expirationPointService = expirationPointService;
         this.expirationPointRepository = expirationPointRepository;
+        this.expirationPointQueryService = expirationPointQueryService;
     }
 
     /**
@@ -136,12 +145,26 @@ public class ExpirationPointResource {
     /**
      * {@code GET  /expiration-points} : get all the expirationPoints.
      *
+     * @param criteria the criteria which the requested entities should match.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of expirationPoints in body.
      */
     @GetMapping("/expiration-points")
-    public List<ExpirationPoint> getAllExpirationPoints() {
-        log.debug("REST request to get all ExpirationPoints");
-        return expirationPointService.findAll();
+    public ResponseEntity<List<ExpirationPoint>> getAllExpirationPoints(ExpirationPointCriteria criteria) {
+        log.debug("REST request to get ExpirationPoints by criteria: {}", criteria);
+        List<ExpirationPoint> entityList = expirationPointQueryService.findByCriteria(criteria);
+        return ResponseEntity.ok().body(entityList);
+    }
+
+    /**
+     * {@code GET  /expiration-points/count} : count all the expirationPoints.
+     *
+     * @param criteria the criteria which the requested entities should match.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count in body.
+     */
+    @GetMapping("/expiration-points/count")
+    public ResponseEntity<Long> countExpirationPoints(ExpirationPointCriteria criteria) {
+        log.debug("REST request to count ExpirationPoints by criteria: {}", criteria);
+        return ResponseEntity.ok().body(expirationPointQueryService.countByCriteria(criteria));
     }
 
     /**

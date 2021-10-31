@@ -2,7 +2,9 @@ package com.mycompany.myapp.web.rest;
 
 import com.mycompany.myapp.domain.DocumentType;
 import com.mycompany.myapp.repository.DocumentTypeRepository;
+import com.mycompany.myapp.service.DocumentTypeQueryService;
 import com.mycompany.myapp.service.DocumentTypeService;
+import com.mycompany.myapp.service.criteria.DocumentTypeCriteria;
 import com.mycompany.myapp.web.rest.errors.BadRequestAlertException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -37,9 +39,16 @@ public class DocumentTypeResource {
 
     private final DocumentTypeRepository documentTypeRepository;
 
-    public DocumentTypeResource(DocumentTypeService documentTypeService, DocumentTypeRepository documentTypeRepository) {
+    private final DocumentTypeQueryService documentTypeQueryService;
+
+    public DocumentTypeResource(
+        DocumentTypeService documentTypeService,
+        DocumentTypeRepository documentTypeRepository,
+        DocumentTypeQueryService documentTypeQueryService
+    ) {
         this.documentTypeService = documentTypeService;
         this.documentTypeRepository = documentTypeRepository;
+        this.documentTypeQueryService = documentTypeQueryService;
     }
 
     /**
@@ -135,12 +144,26 @@ public class DocumentTypeResource {
     /**
      * {@code GET  /document-types} : get all the documentTypes.
      *
+     * @param criteria the criteria which the requested entities should match.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of documentTypes in body.
      */
     @GetMapping("/document-types")
-    public List<DocumentType> getAllDocumentTypes() {
-        log.debug("REST request to get all DocumentTypes");
-        return documentTypeService.findAll();
+    public ResponseEntity<List<DocumentType>> getAllDocumentTypes(DocumentTypeCriteria criteria) {
+        log.debug("REST request to get DocumentTypes by criteria: {}", criteria);
+        List<DocumentType> entityList = documentTypeQueryService.findByCriteria(criteria);
+        return ResponseEntity.ok().body(entityList);
+    }
+
+    /**
+     * {@code GET  /document-types/count} : count all the documentTypes.
+     *
+     * @param criteria the criteria which the requested entities should match.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count in body.
+     */
+    @GetMapping("/document-types/count")
+    public ResponseEntity<Long> countDocumentTypes(DocumentTypeCriteria criteria) {
+        log.debug("REST request to count DocumentTypes by criteria: {}", criteria);
+        return ResponseEntity.ok().body(documentTypeQueryService.countByCriteria(criteria));
     }
 
     /**

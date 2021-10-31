@@ -9,4 +9,4 @@ import org.springframework.stereotype.Repository;
  */
 @SuppressWarnings("unused")
 @Repository
-public interface PointUseDetRepository extends JpaRepository<PointUseDet, Long> {}
+public interface PointUseDetRepository extends JpaRepository<PointUseDet, Long>, JpaSpecificationExecutor<PointUseDet> {}

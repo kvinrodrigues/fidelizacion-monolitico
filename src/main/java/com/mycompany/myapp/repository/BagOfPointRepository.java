@@ -9,4 +9,4 @@ import org.springframework.stereotype.Repository;
  */
 @SuppressWarnings("unused")
 @Repository
-public interface BagOfPointRepository extends JpaRepository<BagOfPoint, Long> {}
+public interface BagOfPointRepository extends JpaRepository<BagOfPoint, Long>, JpaSpecificationExecutor<BagOfPoint> {}

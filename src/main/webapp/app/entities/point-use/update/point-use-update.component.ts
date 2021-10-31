@@ -113,7 +113,7 @@ export class PointUseUpdateComponent implements OnInit {
 
   protected loadRelationshipsOptions(): void {
     this.clientService
-      .query({ filter: 'pointuse-is-null' })
+      .query({ 'pointUseId.specified': 'false' })
       .pipe(map((res: HttpResponse<IClient[]>) => res.body ?? []))
       .pipe(map((clients: IClient[]) => this.clientService.addClientToCollectionIfMissing(clients, this.editForm.get('client')!.value)))
       .subscribe((clients: IClient[]) => (this.clientsCollection = clients));
