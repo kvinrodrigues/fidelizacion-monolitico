@@ -13,8 +13,6 @@ import { IDocumentType } from 'app/entities/document-type/document-type.model';
 import { DocumentTypeService } from 'app/entities/document-type/service/document-type.service';
 import { INacionality } from 'app/entities/nacionality/nacionality.model';
 import { NacionalityService } from 'app/entities/nacionality/service/nacionality.service';
-import { IBagOfPoint } from 'app/entities/bag-of-point/bag-of-point.model';
-import { BagOfPointService } from 'app/entities/bag-of-point/service/bag-of-point.service';
 
 import { ClientUpdateComponent } from './client-update.component';
 
@@ -26,7 +24,6 @@ describe('Component Tests', () => {
     let clientService: ClientService;
     let documentTypeService: DocumentTypeService;
     let nacionalityService: NacionalityService;
-    let bagOfPointService: BagOfPointService;
 
     beforeEach(() => {
       TestBed.configureTestingModule({
@@ -42,7 +39,6 @@ describe('Component Tests', () => {
       clientService = TestBed.inject(ClientService);
       documentTypeService = TestBed.inject(DocumentTypeService);
       nacionalityService = TestBed.inject(NacionalityService);
-      bagOfPointService = TestBed.inject(BagOfPointService);
 
       comp = fixture.componentInstance;
     });
@@ -92,33 +88,12 @@ describe('Component Tests', () => {
         expect(comp.nacionalitiesSharedCollection).toEqual(expectedCollection);
       });
 
-      it('Should call BagOfPoint query and add missing value', () => {
-        const client: IClient = { id: 456 };
-        const bagOfPoint: IBagOfPoint = { id: 77056 };
-        client.bagOfPoint = bagOfPoint;
-
-        const bagOfPointCollection: IBagOfPoint[] = [{ id: 4097 }];
-        jest.spyOn(bagOfPointService, 'query').mockReturnValue(of(new HttpResponse({ body: bagOfPointCollection })));
-        const additionalBagOfPoints = [bagOfPoint];
-        const expectedCollection: IBagOfPoint[] = [...additionalBagOfPoints, ...bagOfPointCollection];
-        jest.spyOn(bagOfPointService, 'addBagOfPointToCollectionIfMissing').mockReturnValue(expectedCollection);
-
-        activatedRoute.data = of({ client });
-        comp.ngOnInit();
-
-        expect(bagOfPointService.query).toHaveBeenCalled();
-        expect(bagOfPointService.addBagOfPointToCollectionIfMissing).toHaveBeenCalledWith(bagOfPointCollection, ...additionalBagOfPoints);
-        expect(comp.bagOfPointsSharedCollection).toEqual(expectedCollection);
-      });
-
       it('Should update editForm', () => {
         const client: IClient = { id: 456 };
         const documentType: IDocumentType = { id: 8105 };
         client.documentType = documentType;
         const nacionality: INacionality = { id: 17236 };
         client.nacionality = nacionality;
-        const bagOfPoint: IBagOfPoint = { id: 54269 };
-        client.bagOfPoint = bagOfPoint;
 
         activatedRoute.data = of({ client });
         comp.ngOnInit();
@@ -126,7 +101,6 @@ describe('Component Tests', () => {
         expect(comp.editForm.value).toEqual(expect.objectContaining(client));
         expect(comp.documentTypesSharedCollection).toContain(documentType);
         expect(comp.nacionalitiesSharedCollection).toContain(nacionality);
-        expect(comp.bagOfPointsSharedCollection).toContain(bagOfPoint);
       });
     });
 
@@ -207,14 +181,6 @@ describe('Component Tests', () => {
         it('Should return tracked Nacionality primary key', () => {
           const entity = { id: 123 };
           const trackResult = comp.trackNacionalityById(0, entity);
-          expect(trackResult).toEqual(entity.id);
-        });
-      });
-
-      describe('trackBagOfPointById', () => {
-        it('Should return tracked BagOfPoint primary key', () => {
-          const entity = { id: 123 };
-          const trackResult = comp.trackBagOfPointById(0, entity);
           expect(trackResult).toEqual(entity.id);
         });
       });

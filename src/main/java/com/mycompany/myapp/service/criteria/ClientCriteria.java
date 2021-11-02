@@ -39,11 +39,13 @@ public class ClientCriteria implements Serializable, Criteria {
 
     private InstantFilter birthDate;
 
+    private LongFilter bagOfPointId;
+
+    private LongFilter pointUseId;
+
     private LongFilter documentTypeId;
 
     private LongFilter nacionalityId;
-
-    private LongFilter bagOfPointId;
 
     private Boolean distinct;
 
@@ -57,9 +59,10 @@ public class ClientCriteria implements Serializable, Criteria {
         this.email = other.email == null ? null : other.email.copy();
         this.phoneNumber = other.phoneNumber == null ? null : other.phoneNumber.copy();
         this.birthDate = other.birthDate == null ? null : other.birthDate.copy();
+        this.bagOfPointId = other.bagOfPointId == null ? null : other.bagOfPointId.copy();
+        this.pointUseId = other.pointUseId == null ? null : other.pointUseId.copy();
         this.documentTypeId = other.documentTypeId == null ? null : other.documentTypeId.copy();
         this.nacionalityId = other.nacionalityId == null ? null : other.nacionalityId.copy();
-        this.bagOfPointId = other.bagOfPointId == null ? null : other.bagOfPointId.copy();
         this.distinct = other.distinct;
     }
 
@@ -173,6 +176,36 @@ public class ClientCriteria implements Serializable, Criteria {
         this.birthDate = birthDate;
     }
 
+    public LongFilter getBagOfPointId() {
+        return bagOfPointId;
+    }
+
+    public LongFilter bagOfPointId() {
+        if (bagOfPointId == null) {
+            bagOfPointId = new LongFilter();
+        }
+        return bagOfPointId;
+    }
+
+    public void setBagOfPointId(LongFilter bagOfPointId) {
+        this.bagOfPointId = bagOfPointId;
+    }
+
+    public LongFilter getPointUseId() {
+        return pointUseId;
+    }
+
+    public LongFilter pointUseId() {
+        if (pointUseId == null) {
+            pointUseId = new LongFilter();
+        }
+        return pointUseId;
+    }
+
+    public void setPointUseId(LongFilter pointUseId) {
+        this.pointUseId = pointUseId;
+    }
+
     public LongFilter getDocumentTypeId() {
         return documentTypeId;
     }
@@ -203,21 +236,6 @@ public class ClientCriteria implements Serializable, Criteria {
         this.nacionalityId = nacionalityId;
     }
 
-    public LongFilter getBagOfPointId() {
-        return bagOfPointId;
-    }
-
-    public LongFilter bagOfPointId() {
-        if (bagOfPointId == null) {
-            bagOfPointId = new LongFilter();
-        }
-        return bagOfPointId;
-    }
-
-    public void setBagOfPointId(LongFilter bagOfPointId) {
-        this.bagOfPointId = bagOfPointId;
-    }
-
     public Boolean getDistinct() {
         return distinct;
     }
@@ -243,9 +261,10 @@ public class ClientCriteria implements Serializable, Criteria {
             Objects.equals(email, that.email) &&
             Objects.equals(phoneNumber, that.phoneNumber) &&
             Objects.equals(birthDate, that.birthDate) &&
+            Objects.equals(bagOfPointId, that.bagOfPointId) &&
+            Objects.equals(pointUseId, that.pointUseId) &&
             Objects.equals(documentTypeId, that.documentTypeId) &&
             Objects.equals(nacionalityId, that.nacionalityId) &&
-            Objects.equals(bagOfPointId, that.bagOfPointId) &&
             Objects.equals(distinct, that.distinct)
         );
     }
@@ -260,9 +279,10 @@ public class ClientCriteria implements Serializable, Criteria {
             email,
             phoneNumber,
             birthDate,
+            bagOfPointId,
+            pointUseId,
             documentTypeId,
             nacionalityId,
-            bagOfPointId,
             distinct
         );
     }
@@ -278,9 +298,10 @@ public class ClientCriteria implements Serializable, Criteria {
             (email != null ? "email=" + email + ", " : "") +
             (phoneNumber != null ? "phoneNumber=" + phoneNumber + ", " : "") +
             (birthDate != null ? "birthDate=" + birthDate + ", " : "") +
+            (bagOfPointId != null ? "bagOfPointId=" + bagOfPointId + ", " : "") +
+            (pointUseId != null ? "pointUseId=" + pointUseId + ", " : "") +
             (documentTypeId != null ? "documentTypeId=" + documentTypeId + ", " : "") +
             (nacionalityId != null ? "nacionalityId=" + nacionalityId + ", " : "") +
-            (bagOfPointId != null ? "bagOfPointId=" + bagOfPointId + ", " : "") +
             (distinct != null ? "distinct=" + distinct + ", " : "") +
             "}";
     }

@@ -30,20 +30,25 @@
       "fieldName": "operationAmount",
       "fieldType": "Float",
       "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "state",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
     }
   ],
   "relationships": [
     {
       "relationshipType": "one-to-many",
-      "otherEntityName": "client",
-      "otherEntityRelationshipName": "bagOfPoint",
-      "relationshipName": "client"
-    },
-    {
-      "relationshipType": "one-to-many",
       "otherEntityName": "pointUseDet",
       "otherEntityRelationshipName": "bagOfPoint",
       "relationshipName": "pointUseDetail"
+    },
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "client",
+      "otherEntityRelationshipName": "bagOfPoint",
+      "relationshipName": "client"
     }
   ],
   "entityTableName": "bag_of_point",

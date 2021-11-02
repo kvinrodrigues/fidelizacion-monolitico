@@ -38,6 +38,16 @@
         <dd>
           <span>{{ bagOfPoint.operationAmount }}</span>
         </dd>
+        <dt><span>State</span></dt>
+        <dd>
+          <span>{{ bagOfPoint.state }}</span>
+        </dd>
+        <dt><span>Client</span></dt>
+        <dd>
+          <div *ngIf="bagOfPoint.client">
+            <a [routerLink]="['/client', bagOfPoint.client?.id, 'view']">{{ bagOfPoint.client?.id }}</a>
+          </div>
+        </dd>
       </dl>
 
       <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">

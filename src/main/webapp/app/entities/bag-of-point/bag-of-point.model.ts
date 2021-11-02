@@ -1,6 +1,6 @@
 import * as dayjs from 'dayjs';
-import { IClient } from 'app/entities/client/client.model';
 import { IPointUseDet } from 'app/entities/point-use-det/point-use-det.model';
+import { IClient } from 'app/entities/client/client.model';
 
 export interface IBagOfPoint {
   id?: number;
@@ -10,8 +10,9 @@ export interface IBagOfPoint {
   scoreUsed?: number;
   scoreBalance?: number;
   operationAmount?: number;
-  clients?: IClient[] | null;
+  state?: string;
   pointUseDetails?: IPointUseDet[] | null;
+  client?: IClient | null;
 }
 
 export class BagOfPoint implements IBagOfPoint {
@@ -23,8 +24,9 @@ export class BagOfPoint implements IBagOfPoint {
     public scoreUsed?: number,
     public scoreBalance?: number,
     public operationAmount?: number,
-    public clients?: IClient[] | null,
-    public pointUseDetails?: IPointUseDet[] | null
+    public state?: string,
+    public pointUseDetails?: IPointUseDet[] | null,
+    public client?: IClient | null
   ) {}
 }
 

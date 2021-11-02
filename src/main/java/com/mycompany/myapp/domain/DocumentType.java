@@ -31,7 +31,7 @@ public class DocumentType implements Serializable {
     private String description;
 
     @OneToMany(mappedBy = "documentType")
-    @JsonIgnoreProperties(value = { "documentType", "nacionality", "bagOfPoint" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "bagOfPoints", "pointUses", "documentType", "nacionality" }, allowSetters = true)
     private Set<Client> clients = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

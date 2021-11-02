@@ -39,9 +39,11 @@ public class BagOfPointCriteria implements Serializable, Criteria {
 
     private FloatFilter operationAmount;
 
-    private LongFilter clientId;
+    private StringFilter state;
 
     private LongFilter pointUseDetailId;
+
+    private LongFilter clientId;
 
     private Boolean distinct;
 
@@ -55,8 +57,9 @@ public class BagOfPointCriteria implements Serializable, Criteria {
         this.scoreUsed = other.scoreUsed == null ? null : other.scoreUsed.copy();
         this.scoreBalance = other.scoreBalance == null ? null : other.scoreBalance.copy();
         this.operationAmount = other.operationAmount == null ? null : other.operationAmount.copy();
-        this.clientId = other.clientId == null ? null : other.clientId.copy();
+        this.state = other.state == null ? null : other.state.copy();
         this.pointUseDetailId = other.pointUseDetailId == null ? null : other.pointUseDetailId.copy();
+        this.clientId = other.clientId == null ? null : other.clientId.copy();
         this.distinct = other.distinct;
     }
 
@@ -170,19 +173,19 @@ public class BagOfPointCriteria implements Serializable, Criteria {
         this.operationAmount = operationAmount;
     }
 
-    public LongFilter getClientId() {
-        return clientId;
+    public StringFilter getState() {
+        return state;
     }
 
-    public LongFilter clientId() {
-        if (clientId == null) {
-            clientId = new LongFilter();
+    public StringFilter state() {
+        if (state == null) {
+            state = new StringFilter();
         }
-        return clientId;
+        return state;
     }
 
-    public void setClientId(LongFilter clientId) {
-        this.clientId = clientId;
+    public void setState(StringFilter state) {
+        this.state = state;
     }
 
     public LongFilter getPointUseDetailId() {
@@ -198,6 +201,21 @@ public class BagOfPointCriteria implements Serializable, Criteria {
 
     public void setPointUseDetailId(LongFilter pointUseDetailId) {
         this.pointUseDetailId = pointUseDetailId;
+    }
+
+    public LongFilter getClientId() {
+        return clientId;
+    }
+
+    public LongFilter clientId() {
+        if (clientId == null) {
+            clientId = new LongFilter();
+        }
+        return clientId;
+    }
+
+    public void setClientId(LongFilter clientId) {
+        this.clientId = clientId;
     }
 
     public Boolean getDistinct() {
@@ -225,8 +243,9 @@ public class BagOfPointCriteria implements Serializable, Criteria {
             Objects.equals(scoreUsed, that.scoreUsed) &&
             Objects.equals(scoreBalance, that.scoreBalance) &&
             Objects.equals(operationAmount, that.operationAmount) &&
-            Objects.equals(clientId, that.clientId) &&
+            Objects.equals(state, that.state) &&
             Objects.equals(pointUseDetailId, that.pointUseDetailId) &&
+            Objects.equals(clientId, that.clientId) &&
             Objects.equals(distinct, that.distinct)
         );
     }
@@ -241,8 +260,9 @@ public class BagOfPointCriteria implements Serializable, Criteria {
             scoreUsed,
             scoreBalance,
             operationAmount,
-            clientId,
+            state,
             pointUseDetailId,
+            clientId,
             distinct
         );
     }
@@ -258,8 +278,9 @@ public class BagOfPointCriteria implements Serializable, Criteria {
             (scoreUsed != null ? "scoreUsed=" + scoreUsed + ", " : "") +
             (scoreBalance != null ? "scoreBalance=" + scoreBalance + ", " : "") +
             (operationAmount != null ? "operationAmount=" + operationAmount + ", " : "") +
-            (clientId != null ? "clientId=" + clientId + ", " : "") +
+            (state != null ? "state=" + state + ", " : "") +
             (pointUseDetailId != null ? "pointUseDetailId=" + pointUseDetailId + ", " : "") +
+            (clientId != null ? "clientId=" + clientId + ", " : "") +
             (distinct != null ? "distinct=" + distinct + ", " : "") +
             "}";
     }

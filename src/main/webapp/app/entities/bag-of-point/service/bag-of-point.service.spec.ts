@@ -31,6 +31,7 @@ describe('BagOfPoint Service', () => {
       scoreUsed: 0,
       scoreBalance: 0,
       operationAmount: 0,
+      state: 'AAAAAAA',
     };
   });
 
@@ -86,6 +87,7 @@ describe('BagOfPoint Service', () => {
           scoreUsed: 1,
           scoreBalance: 1,
           operationAmount: 1,
+          state: 'BBBBBB',
         },
         elemDefault
       );
@@ -112,6 +114,7 @@ describe('BagOfPoint Service', () => {
           expirationDate: currentDate.format(DATE_TIME_FORMAT),
           assignedScore: 1,
           scoreBalance: 1,
+          state: 'BBBBBB',
         },
         new BagOfPoint()
       );
@@ -143,6 +146,7 @@ describe('BagOfPoint Service', () => {
           scoreUsed: 1,
           scoreBalance: 1,
           operationAmount: 1,
+          state: 'BBBBBB',
         },
         elemDefault
       );
@@ -200,7 +204,7 @@ describe('BagOfPoint Service', () => {
       });
 
       it('should add only unique BagOfPoint to an array', () => {
-        const bagOfPointArray: IBagOfPoint[] = [{ id: 123 }, { id: 456 }, { id: 73274 }];
+        const bagOfPointArray: IBagOfPoint[] = [{ id: 123 }, { id: 456 }, { id: 33163 }];
         const bagOfPointCollection: IBagOfPoint[] = [{ id: 123 }];
         expectedResult = service.addBagOfPointToCollectionIfMissing(bagOfPointCollection, ...bagOfPointArray);
         expect(expectedResult).toHaveLength(3);

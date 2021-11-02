@@ -34,6 +34,18 @@
   ],
   "relationships": [
     {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "bagOfPoint",
+      "otherEntityRelationshipName": "client",
+      "relationshipName": "bagOfPoint"
+    },
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "pointUse",
+      "otherEntityRelationshipName": "client",
+      "relationshipName": "pointUse"
+    },
+    {
       "relationshipType": "many-to-one",
       "otherEntityName": "documentType",
       "otherEntityRelationshipName": "client",
@@ -44,12 +56,6 @@
       "otherEntityName": "nacionality",
       "otherEntityRelationshipName": "client",
       "relationshipName": "nacionality"
-    },
-    {
-      "relationshipType": "many-to-one",
-      "otherEntityName": "bagOfPoint",
-      "otherEntityRelationshipName": "client",
-      "relationshipName": "bagOfPoint"
     }
   ],
   "entityTableName": "client",

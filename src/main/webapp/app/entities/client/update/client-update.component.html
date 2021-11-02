@@ -119,21 +119,6 @@
             </option>
           </select>
         </div>
-
-        <div class="form-group">
-          <label class="form-control-label" for="field_bagOfPoint">Bag Of Point</label>
-          <select class="form-control" id="field_bagOfPoint" data-cy="bagOfPoint" name="bagOfPoint" formControlName="bagOfPoint">
-            <option [ngValue]="null"></option>
-            <option
-              [ngValue]="
-                bagOfPointOption.id === editForm.get('bagOfPoint')!.value?.id ? editForm.get('bagOfPoint')!.value : bagOfPointOption
-              "
-              *ngFor="let bagOfPointOption of bagOfPointsSharedCollection; trackBy: trackBagOfPointById"
-            >
-              {{ bagOfPointOption.id }}
-            </option>
-          </select>
-        </div>
       </div>
 
       <div>

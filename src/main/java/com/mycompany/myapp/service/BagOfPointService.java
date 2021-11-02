@@ -36,17 +36,6 @@ public class BagOfPointService {
     }
 
     /**
-     * Save a bagOfPoint.
-     *
-     * @param bagOfPoints the entities to save.
-     * @return the persisted entities.
-     */
-    public List<BagOfPoint> saveAll(List<BagOfPoint> bagOfPoints) {
-        log.debug("Request to save BagOfPoint : {}", bagOfPoints);
-        return bagOfPointRepository.saveAll(bagOfPoints);
-    }
-
-    /**
      * Partially update a bagOfPoint.
      *
      * @param bagOfPoint the entity to update partially.
@@ -75,6 +64,9 @@ public class BagOfPointService {
                 }
                 if (bagOfPoint.getOperationAmount() != null) {
                     existingBagOfPoint.setOperationAmount(bagOfPoint.getOperationAmount());
+                }
+                if (bagOfPoint.getState() != null) {
+                    existingBagOfPoint.setState(bagOfPoint.getState());
                 }
 
                 return existingBagOfPoint;

@@ -44,22 +44,23 @@ describe('Component Tests', () => {
     });
 
     describe('ngOnInit', () => {
-      it('Should call client query and add missing value', () => {
+      it('Should call Client query and add missing value', () => {
         const pointUse: IPointUse = { id: 456 };
         const client: IClient = { id: 78368 };
         pointUse.client = client;
 
         const clientCollection: IClient[] = [{ id: 11675 }];
         jest.spyOn(clientService, 'query').mockReturnValue(of(new HttpResponse({ body: clientCollection })));
-        const expectedCollection: IClient[] = [client, ...clientCollection];
+        const additionalClients = [client];
+        const expectedCollection: IClient[] = [...additionalClients, ...clientCollection];
         jest.spyOn(clientService, 'addClientToCollectionIfMissing').mockReturnValue(expectedCollection);
 
         activatedRoute.data = of({ pointUse });
         comp.ngOnInit();
 
         expect(clientService.query).toHaveBeenCalled();
-        expect(clientService.addClientToCollectionIfMissing).toHaveBeenCalledWith(clientCollection, client);
-        expect(comp.clientsCollection).toEqual(expectedCollection);
+        expect(clientService.addClientToCollectionIfMissing).toHaveBeenCalledWith(clientCollection, ...additionalClients);
+        expect(comp.clientsSharedCollection).toEqual(expectedCollection);
       });
 
       it('Should call PointUsageConcept query and add missing value', () => {
@@ -95,7 +96,7 @@ describe('Component Tests', () => {
         comp.ngOnInit();
 
         expect(comp.editForm.value).toEqual(expect.objectContaining(pointUse));
-        expect(comp.clientsCollection).toContain(client);
+        expect(comp.clientsSharedCollection).toContain(client);
         expect(comp.pointUsageConceptsSharedCollection).toContain(pointUsageConcept);
       });
     });

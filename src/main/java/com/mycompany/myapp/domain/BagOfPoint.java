@@ -47,13 +47,17 @@ public class BagOfPoint implements Serializable {
     @Column(name = "operation_amount", nullable = false)
     private Float operationAmount;
 
-    @OneToMany(mappedBy = "bagOfPoint")
-    @JsonIgnoreProperties(value = { "documentType", "nacionality", "bagOfPoint" }, allowSetters = true)
-    private Set<Client> clients = new HashSet<>();
+    @NotNull
+    @Column(name = "state", nullable = false)
+    private String state;
 
     @OneToMany(mappedBy = "bagOfPoint")
     @JsonIgnoreProperties(value = { "pointUse", "bagOfPoint" }, allowSetters = true)
     private Set<PointUseDet> pointUseDetails = new HashSet<>();
+
+    @ManyToOne
+    @JsonIgnoreProperties(value = { "bagOfPoints", "pointUses", "documentType", "nacionality" }, allowSetters = true)
+    private Client client;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -148,35 +152,17 @@ public class BagOfPoint implements Serializable {
         this.operationAmount = operationAmount;
     }
 
-    public Set<Client> getClients() {
-        return this.clients;
+    public String getState() {
+        return this.state;
     }
 
-    public void setClients(Set<Client> clients) {
-        if (this.clients != null) {
-            this.clients.forEach(i -> i.setBagOfPoint(null));
-        }
-        if (clients != null) {
-            clients.forEach(i -> i.setBagOfPoint(this));
-        }
-        this.clients = clients;
-    }
-
-    public BagOfPoint clients(Set<Client> clients) {
-        this.setClients(clients);
+    public BagOfPoint state(String state) {
+        this.setState(state);
         return this;
     }
 
-    public BagOfPoint addClient(Client client) {
-        this.clients.add(client);
-        client.setBagOfPoint(this);
-        return this;
-    }
-
-    public BagOfPoint removeClient(Client client) {
-        this.clients.remove(client);
-        client.setBagOfPoint(null);
-        return this;
+    public void setState(String state) {
+        this.state = state;
     }
 
     public Set<PointUseDet> getPointUseDetails() {
@@ -210,6 +196,19 @@ public class BagOfPoint implements Serializable {
         return this;
     }
 
+    public Client getClient() {
+        return this.client;
+    }
+
+    public void setClient(Client client) {
+        this.client = client;
+    }
+
+    public BagOfPoint client(Client client) {
+        this.setClient(client);
+        return this;
+    }
+
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
 
     @Override
@@ -240,6 +239,7 @@ public class BagOfPoint implements Serializable {
             ", scoreUsed=" + getScoreUsed() +
             ", scoreBalance=" + getScoreBalance() +
             ", operationAmount=" + getOperationAmount() +
+            ", state='" + getState() + "'" +
             "}";
     }
 }

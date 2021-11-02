@@ -9,6 +9,8 @@ import { of, Subject } from 'rxjs';
 
 import { BagOfPointService } from '../service/bag-of-point.service';
 import { IBagOfPoint, BagOfPoint } from '../bag-of-point.model';
+import { IClient } from 'app/entities/client/client.model';
+import { ClientService } from 'app/entities/client/service/client.service';
 
 import { BagOfPointUpdateComponent } from './bag-of-point-update.component';
 
@@ -18,6 +20,7 @@ describe('Component Tests', () => {
     let fixture: ComponentFixture<BagOfPointUpdateComponent>;
     let activatedRoute: ActivatedRoute;
     let bagOfPointService: BagOfPointService;
+    let clientService: ClientService;
 
     beforeEach(() => {
       TestBed.configureTestingModule({
@@ -31,18 +34,41 @@ describe('Component Tests', () => {
       fixture = TestBed.createComponent(BagOfPointUpdateComponent);
       activatedRoute = TestBed.inject(ActivatedRoute);
       bagOfPointService = TestBed.inject(BagOfPointService);
+      clientService = TestBed.inject(ClientService);
 
       comp = fixture.componentInstance;
     });
 
     describe('ngOnInit', () => {
+      it('Should call Client query and add missing value', () => {
+        const bagOfPoint: IBagOfPoint = { id: 456 };
+        const client: IClient = { id: 22095 };
+        bagOfPoint.client = client;
+
+        const clientCollection: IClient[] = [{ id: 39811 }];
+        jest.spyOn(clientService, 'query').mockReturnValue(of(new HttpResponse({ body: clientCollection })));
+        const additionalClients = [client];
+        const expectedCollection: IClient[] = [...additionalClients, ...clientCollection];
+        jest.spyOn(clientService, 'addClientToCollectionIfMissing').mockReturnValue(expectedCollection);
+
+        activatedRoute.data = of({ bagOfPoint });
+        comp.ngOnInit();
+
+        expect(clientService.query).toHaveBeenCalled();
+        expect(clientService.addClientToCollectionIfMissing).toHaveBeenCalledWith(clientCollection, ...additionalClients);
+        expect(comp.clientsSharedCollection).toEqual(expectedCollection);
+      });
+
       it('Should update editForm', () => {
         const bagOfPoint: IBagOfPoint = { id: 456 };
+        const client: IClient = { id: 54668 };
+        bagOfPoint.client = client;
 
         activatedRoute.data = of({ bagOfPoint });
         comp.ngOnInit();
 
         expect(comp.editForm.value).toEqual(expect.objectContaining(bagOfPoint));
+        expect(comp.clientsSharedCollection).toContain(client);
       });
     });
 
@@ -107,6 +133,16 @@ describe('Component Tests', () => {
         expect(bagOfPointService.update).toHaveBeenCalledWith(bagOfPoint);
         expect(comp.isSaving).toEqual(false);
         expect(comp.previousState).not.toHaveBeenCalled();
+      });
+    });
+
+    describe('Tracking relationships identifiers', () => {
+      describe('trackClientById', () => {
+        it('Should return tracked Client primary key', () => {
+          const entity = { id: 123 };
+          const trackResult = comp.trackClientById(0, entity);
+          expect(trackResult).toEqual(entity.id);
+        });
       });
     });
   });

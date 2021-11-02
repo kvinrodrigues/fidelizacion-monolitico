@@ -50,12 +50,6 @@
             <a [routerLink]="['/nacionality', client.nacionality?.id, 'view']">{{ client.nacionality?.id }}</a>
           </div>
         </dd>
-        <dt><span>Bag Of Point</span></dt>
-        <dd>
-          <div *ngIf="client.bagOfPoint">
-            <a [routerLink]="['/bag-of-point', client.bagOfPoint?.id, 'view']">{{ client.bagOfPoint?.id }}</a>
-          </div>
-        </dd>
       </dl>
 
       <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">

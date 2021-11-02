@@ -22,7 +22,7 @@ import { PointUsageConceptService } from 'app/entities/point-usage-concept/servi
 export class PointUseUpdateComponent implements OnInit {
   isSaving = false;
 
-  clientsCollection: IClient[] = [];
+  clientsSharedCollection: IClient[] = [];
   pointUsageConceptsSharedCollection: IPointUsageConcept[] = [];
 
   editForm = this.fb.group({
@@ -104,7 +104,7 @@ export class PointUseUpdateComponent implements OnInit {
       pointUsageConcept: pointUse.pointUsageConcept,
     });
 
-    this.clientsCollection = this.clientService.addClientToCollectionIfMissing(this.clientsCollection, pointUse.client);
+    this.clientsSharedCollection = this.clientService.addClientToCollectionIfMissing(this.clientsSharedCollection, pointUse.client);
     this.pointUsageConceptsSharedCollection = this.pointUsageConceptService.addPointUsageConceptToCollectionIfMissing(
       this.pointUsageConceptsSharedCollection,
       pointUse.pointUsageConcept
@@ -113,10 +113,10 @@ export class PointUseUpdateComponent implements OnInit {
 
   protected loadRelationshipsOptions(): void {
     this.clientService
-      .query({ 'pointUseId.specified': 'false' })
+      .query()
       .pipe(map((res: HttpResponse<IClient[]>) => res.body ?? []))
       .pipe(map((clients: IClient[]) => this.clientService.addClientToCollectionIfMissing(clients, this.editForm.get('client')!.value)))
-      .subscribe((clients: IClient[]) => (this.clientsCollection = clients));
+      .subscribe((clients: IClient[]) => (this.clientsSharedCollection = clients));
 
     this.pointUsageConceptService
       .query()

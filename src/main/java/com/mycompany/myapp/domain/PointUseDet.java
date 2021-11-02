@@ -25,11 +25,11 @@ public class PointUseDet implements Serializable {
     private Long scoreUsed;
 
     @ManyToOne
-    @JsonIgnoreProperties(value = { "client", "pointUseDetails", "pointUsageConcept" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "pointUseDetails", "client", "pointUsageConcept" }, allowSetters = true)
     private PointUse pointUse;
 
     @ManyToOne
-    @JsonIgnoreProperties(value = { "clients", "pointUseDetails" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "pointUseDetails", "client" }, allowSetters = true)
     private BagOfPoint bagOfPoint;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

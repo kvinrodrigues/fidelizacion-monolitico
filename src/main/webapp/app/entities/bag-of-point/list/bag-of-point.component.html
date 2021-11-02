@@ -39,6 +39,8 @@
           <th scope="col"><span>Score Used</span></th>
           <th scope="col"><span>Score Balance</span></th>
           <th scope="col"><span>Operation Amount</span></th>
+          <th scope="col"><span>State</span></th>
+          <th scope="col"><span>Client</span></th>
           <th scope="col"></th>
         </tr>
       </thead>
@@ -53,6 +55,12 @@
           <td>{{ bagOfPoint.scoreUsed }}</td>
           <td>{{ bagOfPoint.scoreBalance }}</td>
           <td>{{ bagOfPoint.operationAmount }}</td>
+          <td>{{ bagOfPoint.state }}</td>
+          <td>
+            <div *ngIf="bagOfPoint.client">
+              <a [routerLink]="['/client', bagOfPoint.client?.id, 'view']">{{ bagOfPoint.client?.id }}</a>
+            </div>
+          </td>
           <td class="text-right">
             <div class="btn-group">
               <button

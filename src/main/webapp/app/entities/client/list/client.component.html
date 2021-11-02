@@ -41,7 +41,6 @@
           <th scope="col"><span>Birth Date</span></th>
           <th scope="col"><span>Document Type</span></th>
           <th scope="col"><span>Nacionality</span></th>
-          <th scope="col"><span>Bag Of Point</span></th>
           <th scope="col"></th>
         </tr>
       </thead>
@@ -64,11 +63,6 @@
           <td>
             <div *ngIf="client.nacionality">
               <a [routerLink]="['/nacionality', client.nacionality?.id, 'view']">{{ client.nacionality?.id }}</a>
-            </div>
-          </td>
-          <td>
-            <div *ngIf="client.bagOfPoint">
-              <a [routerLink]="['/bag-of-point', client.bagOfPoint?.id, 'view']">{{ client.bagOfPoint?.id }}</a>
             </div>
           </td>
           <td class="text-right">

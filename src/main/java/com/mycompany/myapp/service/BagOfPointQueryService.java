@@ -103,11 +103,8 @@ public class BagOfPointQueryService extends QueryService<BagOfPoint> {
             if (criteria.getOperationAmount() != null) {
                 specification = specification.and(buildRangeSpecification(criteria.getOperationAmount(), BagOfPoint_.operationAmount));
             }
-            if (criteria.getClientId() != null) {
-                specification =
-                    specification.and(
-                        buildSpecification(criteria.getClientId(), root -> root.join(BagOfPoint_.clients, JoinType.LEFT).get(Client_.id))
-                    );
+            if (criteria.getState() != null) {
+                specification = specification.and(buildStringSpecification(criteria.getState(), BagOfPoint_.state));
             }
             if (criteria.getPointUseDetailId() != null) {
                 specification =
@@ -116,6 +113,12 @@ public class BagOfPointQueryService extends QueryService<BagOfPoint> {
                             criteria.getPointUseDetailId(),
                             root -> root.join(BagOfPoint_.pointUseDetails, JoinType.LEFT).get(PointUseDet_.id)
                         )
+                    );
+            }
+            if (criteria.getClientId() != null) {
+                specification =
+                    specification.and(
+                        buildSpecification(criteria.getClientId(), root -> root.join(BagOfPoint_.client, JoinType.LEFT).get(Client_.id))
                     );
             }
         }

@@ -31,11 +31,6 @@ public class PointAllocationRule implements Serializable {
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
-    public boolean isInTheRange(float amount) {
-        long convertedAmount = (long) amount;
-        return convertedAmount >= lowerLimit && convertedAmount <= upperLimit;
-    }
-
     public Long getId() {
         return this.id;
     }

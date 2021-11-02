@@ -1,7 +1,8 @@
 import * as dayjs from 'dayjs';
+import { IBagOfPoint } from 'app/entities/bag-of-point/bag-of-point.model';
+import { IPointUse } from 'app/entities/point-use/point-use.model';
 import { IDocumentType } from 'app/entities/document-type/document-type.model';
 import { INacionality } from 'app/entities/nacionality/nacionality.model';
-import { IBagOfPoint } from 'app/entities/bag-of-point/bag-of-point.model';
 
 export interface IClient {
   id?: number;
@@ -11,9 +12,10 @@ export interface IClient {
   email?: string;
   phoneNumber?: string;
   birthDate?: dayjs.Dayjs;
+  bagOfPoints?: IBagOfPoint[] | null;
+  pointUses?: IPointUse[] | null;
   documentType?: IDocumentType | null;
   nacionality?: INacionality | null;
-  bagOfPoint?: IBagOfPoint | null;
 }
 
 export class Client implements IClient {
@@ -25,9 +27,10 @@ export class Client implements IClient {
     public email?: string,
     public phoneNumber?: string,
     public birthDate?: dayjs.Dayjs,
+    public bagOfPoints?: IBagOfPoint[] | null,
+    public pointUses?: IPointUse[] | null,
     public documentType?: IDocumentType | null,
-    public nacionality?: INacionality | null,
-    public bagOfPoint?: IBagOfPoint | null
+    public nacionality?: INacionality | null
   ) {}
 }
 

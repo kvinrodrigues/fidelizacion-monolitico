@@ -1,14 +1,14 @@
 import * as dayjs from 'dayjs';
-import { IClient } from 'app/entities/client/client.model';
 import { IPointUseDet } from 'app/entities/point-use-det/point-use-det.model';
+import { IClient } from 'app/entities/client/client.model';
 import { IPointUsageConcept } from 'app/entities/point-usage-concept/point-usage-concept.model';
 
 export interface IPointUse {
   id?: number;
   scoreUsed?: number;
   eventDate?: dayjs.Dayjs;
-  client?: IClient | null;
   pointUseDetails?: IPointUseDet[] | null;
+  client?: IClient | null;
   pointUsageConcept?: IPointUsageConcept | null;
 }
 
@@ -17,8 +17,8 @@ export class PointUse implements IPointUse {
     public id?: number,
     public scoreUsed?: number,
     public eventDate?: dayjs.Dayjs,
-    public client?: IClient | null,
     public pointUseDetails?: IPointUseDet[] | null,
+    public client?: IClient | null,
     public pointUsageConcept?: IPointUsageConcept | null
   ) {}
 }

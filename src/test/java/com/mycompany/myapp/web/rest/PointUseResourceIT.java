@@ -363,32 +363,6 @@ class PointUseResourceIT {
 
     @Test
     @Transactional
-    void getAllPointUsesByClientIsEqualToSomething() throws Exception {
-        // Initialize the database
-        pointUseRepository.saveAndFlush(pointUse);
-        Client client;
-        if (TestUtil.findAll(em, Client.class).isEmpty()) {
-            client = ClientResourceIT.createEntity(em);
-            em.persist(client);
-            em.flush();
-        } else {
-            client = TestUtil.findAll(em, Client.class).get(0);
-        }
-        em.persist(client);
-        em.flush();
-        pointUse.setClient(client);
-        pointUseRepository.saveAndFlush(pointUse);
-        Long clientId = client.getId();
-
-        // Get all the pointUseList where client equals to clientId
-        defaultPointUseShouldBeFound("clientId.equals=" + clientId);
-
-        // Get all the pointUseList where client equals to (clientId + 1)
-        defaultPointUseShouldNotBeFound("clientId.equals=" + (clientId + 1));
-    }
-
-    @Test
-    @Transactional
     void getAllPointUsesByPointUseDetailIsEqualToSomething() throws Exception {
         // Initialize the database
         pointUseRepository.saveAndFlush(pointUse);
@@ -411,6 +385,32 @@ class PointUseResourceIT {
 
         // Get all the pointUseList where pointUseDetail equals to (pointUseDetailId + 1)
         defaultPointUseShouldNotBeFound("pointUseDetailId.equals=" + (pointUseDetailId + 1));
+    }
+
+    @Test
+    @Transactional
+    void getAllPointUsesByClientIsEqualToSomething() throws Exception {
+        // Initialize the database
+        pointUseRepository.saveAndFlush(pointUse);
+        Client client;
+        if (TestUtil.findAll(em, Client.class).isEmpty()) {
+            client = ClientResourceIT.createEntity(em);
+            em.persist(client);
+            em.flush();
+        } else {
+            client = TestUtil.findAll(em, Client.class).get(0);
+        }
+        em.persist(client);
+        em.flush();
+        pointUse.setClient(client);
+        pointUseRepository.saveAndFlush(pointUse);
+        Long clientId = client.getId();
+
+        // Get all the pointUseList where client equals to clientId
+        defaultPointUseShouldBeFound("clientId.equals=" + clientId);
+
+        // Get all the pointUseList where client equals to (clientId + 1)
+        defaultPointUseShouldNotBeFound("clientId.equals=" + (clientId + 1));
     }
 
     @Test

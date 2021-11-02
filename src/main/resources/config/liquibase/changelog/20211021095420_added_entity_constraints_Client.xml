@@ -19,11 +19,5 @@
                                  constraintName="fk_client__nacionality_id"
                                  referencedColumnNames="id"
                                  referencedTableName="nacionality"/>
-
-        <addForeignKeyConstraint baseColumnNames="bag_of_point_id"
-                                 baseTableName="client"
-                                 constraintName="fk_client__bag_of_point_id"
-                                 referencedColumnNames="id"
-                                 referencedTableName="bag_of_point"/>
     </changeSet>
 </databaseChangeLog>

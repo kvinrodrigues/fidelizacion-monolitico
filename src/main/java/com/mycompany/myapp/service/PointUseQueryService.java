@@ -91,12 +91,6 @@ public class PointUseQueryService extends QueryService<PointUse> {
             if (criteria.getEventDate() != null) {
                 specification = specification.and(buildRangeSpecification(criteria.getEventDate(), PointUse_.eventDate));
             }
-            if (criteria.getClientId() != null) {
-                specification =
-                    specification.and(
-                        buildSpecification(criteria.getClientId(), root -> root.join(PointUse_.client, JoinType.LEFT).get(Client_.id))
-                    );
-            }
             if (criteria.getPointUseDetailId() != null) {
                 specification =
                     specification.and(
@@ -104,6 +98,12 @@ public class PointUseQueryService extends QueryService<PointUse> {
                             criteria.getPointUseDetailId(),
                             root -> root.join(PointUse_.pointUseDetails, JoinType.LEFT).get(PointUseDet_.id)
                         )
+                    );
+            }
+            if (criteria.getClientId() != null) {
+                specification =
+                    specification.and(
+                        buildSpecification(criteria.getClientId(), root -> root.join(PointUse_.client, JoinType.LEFT).get(Client_.id))
                     );
             }
             if (criteria.getPointUsageConceptId() != null) {

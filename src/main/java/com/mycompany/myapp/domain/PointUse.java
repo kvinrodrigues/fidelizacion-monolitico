@@ -31,14 +31,13 @@ public class PointUse implements Serializable {
     @Column(name = "event_date", nullable = false)
     private Instant eventDate;
 
-    @JsonIgnoreProperties(value = { "documentType", "nacionality", "bagOfPoint" }, allowSetters = true)
-    @OneToOne
-    @JoinColumn(unique = true)
-    private Client client;
-
     @OneToMany(mappedBy = "pointUse")
     @JsonIgnoreProperties(value = { "pointUse", "bagOfPoint" }, allowSetters = true)
     private Set<PointUseDet> pointUseDetails = new HashSet<>();
+
+    @ManyToOne
+    @JsonIgnoreProperties(value = { "bagOfPoints", "pointUses", "documentType", "nacionality" }, allowSetters = true)
+    private Client client;
 
     @ManyToOne
     @JsonIgnoreProperties(value = { "pointUses" }, allowSetters = true)
@@ -85,19 +84,6 @@ public class PointUse implements Serializable {
         this.eventDate = eventDate;
     }
 
-    public Client getClient() {
-        return this.client;
-    }
-
-    public void setClient(Client client) {
-        this.client = client;
-    }
-
-    public PointUse client(Client client) {
-        this.setClient(client);
-        return this;
-    }
-
     public Set<PointUseDet> getPointUseDetails() {
         return this.pointUseDetails;
     }
@@ -126,6 +112,19 @@ public class PointUse implements Serializable {
     public PointUse removePointUseDetail(PointUseDet pointUseDet) {
         this.pointUseDetails.remove(pointUseDet);
         pointUseDet.setPointUse(null);
+        return this;
+    }
+
+    public Client getClient() {
+        return this.client;
+    }
+
+    public void setClient(Client client) {
+        this.client = client;
+    }
+
+    public PointUse client(Client client) {
+        this.setClient(client);
         return this;
     }
 

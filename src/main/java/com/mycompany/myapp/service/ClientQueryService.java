@@ -103,6 +103,21 @@ public class ClientQueryService extends QueryService<Client> {
             if (criteria.getBirthDate() != null) {
                 specification = specification.and(buildRangeSpecification(criteria.getBirthDate(), Client_.birthDate));
             }
+            if (criteria.getBagOfPointId() != null) {
+                specification =
+                    specification.and(
+                        buildSpecification(
+                            criteria.getBagOfPointId(),
+                            root -> root.join(Client_.bagOfPoints, JoinType.LEFT).get(BagOfPoint_.id)
+                        )
+                    );
+            }
+            if (criteria.getPointUseId() != null) {
+                specification =
+                    specification.and(
+                        buildSpecification(criteria.getPointUseId(), root -> root.join(Client_.pointUses, JoinType.LEFT).get(PointUse_.id))
+                    );
+            }
             if (criteria.getDocumentTypeId() != null) {
                 specification =
                     specification.and(
@@ -118,15 +133,6 @@ public class ClientQueryService extends QueryService<Client> {
                         buildSpecification(
                             criteria.getNacionalityId(),
                             root -> root.join(Client_.nacionality, JoinType.LEFT).get(Nacionality_.id)
-                        )
-                    );
-            }
-            if (criteria.getBagOfPointId() != null) {
-                specification =
-                    specification.and(
-                        buildSpecification(
-                            criteria.getBagOfPointId(),
-                            root -> root.join(Client_.bagOfPoint, JoinType.LEFT).get(BagOfPoint_.id)
                         )
                     );
             }

@@ -56,6 +56,9 @@ class BagOfPointResourceIT {
     private static final Float UPDATED_OPERATION_AMOUNT = 2F;
     private static final Float SMALLER_OPERATION_AMOUNT = 1F - 1F;
 
+    private static final String DEFAULT_STATE = "AAAAAAAAAA";
+    private static final String UPDATED_STATE = "BBBBBBBBBB";
+
     private static final String ENTITY_API_URL = "/api/bag-of-points";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
@@ -86,7 +89,8 @@ class BagOfPointResourceIT {
             .assignedScore(DEFAULT_ASSIGNED_SCORE)
             .scoreUsed(DEFAULT_SCORE_USED)
             .scoreBalance(DEFAULT_SCORE_BALANCE)
-            .operationAmount(DEFAULT_OPERATION_AMOUNT);
+            .operationAmount(DEFAULT_OPERATION_AMOUNT)
+            .state(DEFAULT_STATE);
         return bagOfPoint;
     }
 
@@ -103,7 +107,8 @@ class BagOfPointResourceIT {
             .assignedScore(UPDATED_ASSIGNED_SCORE)
             .scoreUsed(UPDATED_SCORE_USED)
             .scoreBalance(UPDATED_SCORE_BALANCE)
-            .operationAmount(UPDATED_OPERATION_AMOUNT);
+            .operationAmount(UPDATED_OPERATION_AMOUNT)
+            .state(UPDATED_STATE);
         return bagOfPoint;
     }
 
@@ -131,6 +136,7 @@ class BagOfPointResourceIT {
         assertThat(testBagOfPoint.getScoreUsed()).isEqualTo(DEFAULT_SCORE_USED);
         assertThat(testBagOfPoint.getScoreBalance()).isEqualTo(DEFAULT_SCORE_BALANCE);
         assertThat(testBagOfPoint.getOperationAmount()).isEqualTo(DEFAULT_OPERATION_AMOUNT);
+        assertThat(testBagOfPoint.getState()).isEqualTo(DEFAULT_STATE);
     }
 
     @Test
@@ -255,6 +261,23 @@ class BagOfPointResourceIT {
 
     @Test
     @Transactional
+    void checkStateIsRequired() throws Exception {
+        int databaseSizeBeforeTest = bagOfPointRepository.findAll().size();
+        // set the field null
+        bagOfPoint.setState(null);
+
+        // Create the BagOfPoint, which fails.
+
+        restBagOfPointMockMvc
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(bagOfPoint)))
+            .andExpect(status().isBadRequest());
+
+        List<BagOfPoint> bagOfPointList = bagOfPointRepository.findAll();
+        assertThat(bagOfPointList).hasSize(databaseSizeBeforeTest);
+    }
+
+    @Test
+    @Transactional
     void getAllBagOfPoints() throws Exception {
         // Initialize the database
         bagOfPointRepository.saveAndFlush(bagOfPoint);
@@ -270,7 +293,8 @@ class BagOfPointResourceIT {
             .andExpect(jsonPath("$.[*].assignedScore").value(hasItem(DEFAULT_ASSIGNED_SCORE.intValue())))
             .andExpect(jsonPath("$.[*].scoreUsed").value(hasItem(DEFAULT_SCORE_USED.intValue())))
             .andExpect(jsonPath("$.[*].scoreBalance").value(hasItem(DEFAULT_SCORE_BALANCE.intValue())))
-            .andExpect(jsonPath("$.[*].operationAmount").value(hasItem(DEFAULT_OPERATION_AMOUNT.doubleValue())));
+            .andExpect(jsonPath("$.[*].operationAmount").value(hasItem(DEFAULT_OPERATION_AMOUNT.doubleValue())))
+            .andExpect(jsonPath("$.[*].state").value(hasItem(DEFAULT_STATE)));
     }
 
     @Test
@@ -290,7 +314,8 @@ class BagOfPointResourceIT {
             .andExpect(jsonPath("$.assignedScore").value(DEFAULT_ASSIGNED_SCORE.intValue()))
             .andExpect(jsonPath("$.scoreUsed").value(DEFAULT_SCORE_USED.intValue()))
             .andExpect(jsonPath("$.scoreBalance").value(DEFAULT_SCORE_BALANCE.intValue()))
-            .andExpect(jsonPath("$.operationAmount").value(DEFAULT_OPERATION_AMOUNT.doubleValue()));
+            .andExpect(jsonPath("$.operationAmount").value(DEFAULT_OPERATION_AMOUNT.doubleValue()))
+            .andExpect(jsonPath("$.state").value(DEFAULT_STATE));
     }
 
     @Test
@@ -833,28 +858,80 @@ class BagOfPointResourceIT {
 
     @Test
     @Transactional
-    void getAllBagOfPointsByClientIsEqualToSomething() throws Exception {
+    void getAllBagOfPointsByStateIsEqualToSomething() throws Exception {
         // Initialize the database
         bagOfPointRepository.saveAndFlush(bagOfPoint);
-        Client client;
-        if (TestUtil.findAll(em, Client.class).isEmpty()) {
-            client = ClientResourceIT.createEntity(em);
-            em.persist(client);
-            em.flush();
-        } else {
-            client = TestUtil.findAll(em, Client.class).get(0);
-        }
-        em.persist(client);
-        em.flush();
-        bagOfPoint.addClient(client);
+
+        // Get all the bagOfPointList where state equals to DEFAULT_STATE
+        defaultBagOfPointShouldBeFound("state.equals=" + DEFAULT_STATE);
+
+        // Get all the bagOfPointList where state equals to UPDATED_STATE
+        defaultBagOfPointShouldNotBeFound("state.equals=" + UPDATED_STATE);
+    }
+
+    @Test
+    @Transactional
+    void getAllBagOfPointsByStateIsNotEqualToSomething() throws Exception {
+        // Initialize the database
         bagOfPointRepository.saveAndFlush(bagOfPoint);
-        Long clientId = client.getId();
 
-        // Get all the bagOfPointList where client equals to clientId
-        defaultBagOfPointShouldBeFound("clientId.equals=" + clientId);
+        // Get all the bagOfPointList where state not equals to DEFAULT_STATE
+        defaultBagOfPointShouldNotBeFound("state.notEquals=" + DEFAULT_STATE);
 
-        // Get all the bagOfPointList where client equals to (clientId + 1)
-        defaultBagOfPointShouldNotBeFound("clientId.equals=" + (clientId + 1));
+        // Get all the bagOfPointList where state not equals to UPDATED_STATE
+        defaultBagOfPointShouldBeFound("state.notEquals=" + UPDATED_STATE);
+    }
+
+    @Test
+    @Transactional
+    void getAllBagOfPointsByStateIsInShouldWork() throws Exception {
+        // Initialize the database
+        bagOfPointRepository.saveAndFlush(bagOfPoint);
+
+        // Get all the bagOfPointList where state in DEFAULT_STATE or UPDATED_STATE
+        defaultBagOfPointShouldBeFound("state.in=" + DEFAULT_STATE + "," + UPDATED_STATE);
+
+        // Get all the bagOfPointList where state equals to UPDATED_STATE
+        defaultBagOfPointShouldNotBeFound("state.in=" + UPDATED_STATE);
+    }
+
+    @Test
+    @Transactional
+    void getAllBagOfPointsByStateIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        bagOfPointRepository.saveAndFlush(bagOfPoint);
+
+        // Get all the bagOfPointList where state is not null
+        defaultBagOfPointShouldBeFound("state.specified=true");
+
+        // Get all the bagOfPointList where state is null
+        defaultBagOfPointShouldNotBeFound("state.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllBagOfPointsByStateContainsSomething() throws Exception {
+        // Initialize the database
+        bagOfPointRepository.saveAndFlush(bagOfPoint);
+
+        // Get all the bagOfPointList where state contains DEFAULT_STATE
+        defaultBagOfPointShouldBeFound("state.contains=" + DEFAULT_STATE);
+
+        // Get all the bagOfPointList where state contains UPDATED_STATE
+        defaultBagOfPointShouldNotBeFound("state.contains=" + UPDATED_STATE);
+    }
+
+    @Test
+    @Transactional
+    void getAllBagOfPointsByStateNotContainsSomething() throws Exception {
+        // Initialize the database
+        bagOfPointRepository.saveAndFlush(bagOfPoint);
+
+        // Get all the bagOfPointList where state does not contain DEFAULT_STATE
+        defaultBagOfPointShouldNotBeFound("state.doesNotContain=" + DEFAULT_STATE);
+
+        // Get all the bagOfPointList where state does not contain UPDATED_STATE
+        defaultBagOfPointShouldBeFound("state.doesNotContain=" + UPDATED_STATE);
     }
 
     @Test
@@ -883,6 +960,32 @@ class BagOfPointResourceIT {
         defaultBagOfPointShouldNotBeFound("pointUseDetailId.equals=" + (pointUseDetailId + 1));
     }
 
+    @Test
+    @Transactional
+    void getAllBagOfPointsByClientIsEqualToSomething() throws Exception {
+        // Initialize the database
+        bagOfPointRepository.saveAndFlush(bagOfPoint);
+        Client client;
+        if (TestUtil.findAll(em, Client.class).isEmpty()) {
+            client = ClientResourceIT.createEntity(em);
+            em.persist(client);
+            em.flush();
+        } else {
+            client = TestUtil.findAll(em, Client.class).get(0);
+        }
+        em.persist(client);
+        em.flush();
+        bagOfPoint.setClient(client);
+        bagOfPointRepository.saveAndFlush(bagOfPoint);
+        Long clientId = client.getId();
+
+        // Get all the bagOfPointList where client equals to clientId
+        defaultBagOfPointShouldBeFound("clientId.equals=" + clientId);
+
+        // Get all the bagOfPointList where client equals to (clientId + 1)
+        defaultBagOfPointShouldNotBeFound("clientId.equals=" + (clientId + 1));
+    }
+
     /**
      * Executes the search, and checks that the default entity is returned.
      */
@@ -897,7 +1000,8 @@ class BagOfPointResourceIT {
             .andExpect(jsonPath("$.[*].assignedScore").value(hasItem(DEFAULT_ASSIGNED_SCORE.intValue())))
             .andExpect(jsonPath("$.[*].scoreUsed").value(hasItem(DEFAULT_SCORE_USED.intValue())))
             .andExpect(jsonPath("$.[*].scoreBalance").value(hasItem(DEFAULT_SCORE_BALANCE.intValue())))
-            .andExpect(jsonPath("$.[*].operationAmount").value(hasItem(DEFAULT_OPERATION_AMOUNT.doubleValue())));
+            .andExpect(jsonPath("$.[*].operationAmount").value(hasItem(DEFAULT_OPERATION_AMOUNT.doubleValue())))
+            .andExpect(jsonPath("$.[*].state").value(hasItem(DEFAULT_STATE)));
 
         // Check, that the count call also returns 1
         restBagOfPointMockMvc
@@ -951,7 +1055,8 @@ class BagOfPointResourceIT {
             .assignedScore(UPDATED_ASSIGNED_SCORE)
             .scoreUsed(UPDATED_SCORE_USED)
             .scoreBalance(UPDATED_SCORE_BALANCE)
-            .operationAmount(UPDATED_OPERATION_AMOUNT);
+            .operationAmount(UPDATED_OPERATION_AMOUNT)
+            .state(UPDATED_STATE);
 
         restBagOfPointMockMvc
             .perform(
@@ -971,6 +1076,7 @@ class BagOfPointResourceIT {
         assertThat(testBagOfPoint.getScoreUsed()).isEqualTo(UPDATED_SCORE_USED);
         assertThat(testBagOfPoint.getScoreBalance()).isEqualTo(UPDATED_SCORE_BALANCE);
         assertThat(testBagOfPoint.getOperationAmount()).isEqualTo(UPDATED_OPERATION_AMOUNT);
+        assertThat(testBagOfPoint.getState()).isEqualTo(UPDATED_STATE);
     }
 
     @Test
@@ -1044,7 +1150,8 @@ class BagOfPointResourceIT {
         partialUpdatedBagOfPoint
             .asignationDate(UPDATED_ASIGNATION_DATE)
             .scoreUsed(UPDATED_SCORE_USED)
-            .operationAmount(UPDATED_OPERATION_AMOUNT);
+            .operationAmount(UPDATED_OPERATION_AMOUNT)
+            .state(UPDATED_STATE);
 
         restBagOfPointMockMvc
             .perform(
@@ -1064,6 +1171,7 @@ class BagOfPointResourceIT {
         assertThat(testBagOfPoint.getScoreUsed()).isEqualTo(UPDATED_SCORE_USED);
         assertThat(testBagOfPoint.getScoreBalance()).isEqualTo(DEFAULT_SCORE_BALANCE);
         assertThat(testBagOfPoint.getOperationAmount()).isEqualTo(UPDATED_OPERATION_AMOUNT);
+        assertThat(testBagOfPoint.getState()).isEqualTo(UPDATED_STATE);
     }
 
     @Test
@@ -1084,7 +1192,8 @@ class BagOfPointResourceIT {
             .assignedScore(UPDATED_ASSIGNED_SCORE)
             .scoreUsed(UPDATED_SCORE_USED)
             .scoreBalance(UPDATED_SCORE_BALANCE)
-            .operationAmount(UPDATED_OPERATION_AMOUNT);
+            .operationAmount(UPDATED_OPERATION_AMOUNT)
+            .state(UPDATED_STATE);
 
         restBagOfPointMockMvc
             .perform(
@@ -1104,6 +1213,7 @@ class BagOfPointResourceIT {
         assertThat(testBagOfPoint.getScoreUsed()).isEqualTo(UPDATED_SCORE_USED);
         assertThat(testBagOfPoint.getScoreBalance()).isEqualTo(UPDATED_SCORE_BALANCE);
         assertThat(testBagOfPoint.getOperationAmount()).isEqualTo(UPDATED_OPERATION_AMOUNT);
+        assertThat(testBagOfPoint.getState()).isEqualTo(UPDATED_STATE);
     }
 
     @Test

@@ -3,13 +3,15 @@ import { HttpResponse } from '@angular/common/http';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
-import { finalize } from 'rxjs/operators';
+import { finalize, map } from 'rxjs/operators';
 
 import * as dayjs from 'dayjs';
 import { DATE_TIME_FORMAT } from 'app/config/input.constants';
 
 import { IBagOfPoint, BagOfPoint } from '../bag-of-point.model';
 import { BagOfPointService } from '../service/bag-of-point.service';
+import { IClient } from 'app/entities/client/client.model';
+import { ClientService } from 'app/entities/client/service/client.service';
 
 @Component({
   selector: 'jhi-bag-of-point-update',
@@ -17,6 +19,8 @@ import { BagOfPointService } from '../service/bag-of-point.service';
 })
 export class BagOfPointUpdateComponent implements OnInit {
   isSaving = false;
+
+  clientsSharedCollection: IClient[] = [];
 
   editForm = this.fb.group({
     id: [],
@@ -26,9 +30,16 @@ export class BagOfPointUpdateComponent implements OnInit {
     scoreUsed: [null, [Validators.required]],
     scoreBalance: [null, [Validators.required]],
     operationAmount: [null, [Validators.required]],
+    state: [null, [Validators.required]],
+    client: [],
   });
 
-  constructor(protected bagOfPointService: BagOfPointService, protected activatedRoute: ActivatedRoute, protected fb: FormBuilder) {}
+  constructor(
+    protected bagOfPointService: BagOfPointService,
+    protected clientService: ClientService,
+    protected activatedRoute: ActivatedRoute,
+    protected fb: FormBuilder
+  ) {}
 
   ngOnInit(): void {
     this.activatedRoute.data.subscribe(({ bagOfPoint }) => {
@@ -39,6 +50,8 @@ export class BagOfPointUpdateComponent implements OnInit {
       }
 
       this.updateForm(bagOfPoint);
+
+      this.loadRelationshipsOptions();
     });
   }
 
@@ -54,6 +67,10 @@ export class BagOfPointUpdateComponent implements OnInit {
     } else {
       this.subscribeToSaveResponse(this.bagOfPointService.create(bagOfPoint));
     }
+  }
+
+  trackClientById(index: number, item: IClient): number {
+    return item.id!;
   }
 
   protected subscribeToSaveResponse(result: Observable<HttpResponse<IBagOfPoint>>): void {
@@ -84,7 +101,19 @@ export class BagOfPointUpdateComponent implements OnInit {
       scoreUsed: bagOfPoint.scoreUsed,
       scoreBalance: bagOfPoint.scoreBalance,
       operationAmount: bagOfPoint.operationAmount,
+      state: bagOfPoint.state,
+      client: bagOfPoint.client,
     });
+
+    this.clientsSharedCollection = this.clientService.addClientToCollectionIfMissing(this.clientsSharedCollection, bagOfPoint.client);
+  }
+
+  protected loadRelationshipsOptions(): void {
+    this.clientService
+      .query()
+      .pipe(map((res: HttpResponse<IClient[]>) => res.body ?? []))
+      .pipe(map((clients: IClient[]) => this.clientService.addClientToCollectionIfMissing(clients, this.editForm.get('client')!.value)))
+      .subscribe((clients: IClient[]) => (this.clientsSharedCollection = clients));
   }
 
   protected createFromForm(): IBagOfPoint {
@@ -101,6 +130,8 @@ export class BagOfPointUpdateComponent implements OnInit {
       scoreUsed: this.editForm.get(['scoreUsed'])!.value,
       scoreBalance: this.editForm.get(['scoreBalance'])!.value,
       operationAmount: this.editForm.get(['operationAmount'])!.value,
+      state: this.editForm.get(['state'])!.value,
+      client: this.editForm.get(['client'])!.value,
     };
   }
 }

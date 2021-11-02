@@ -10,6 +10,7 @@ import com.mycompany.myapp.domain.BagOfPoint;
 import com.mycompany.myapp.domain.Client;
 import com.mycompany.myapp.domain.DocumentType;
 import com.mycompany.myapp.domain.Nacionality;
+import com.mycompany.myapp.domain.PointUse;
 import com.mycompany.myapp.repository.ClientRepository;
 import com.mycompany.myapp.service.criteria.ClientCriteria;
 import java.time.Instant;
@@ -752,6 +753,58 @@ class ClientResourceIT {
 
     @Test
     @Transactional
+    void getAllClientsByBagOfPointIsEqualToSomething() throws Exception {
+        // Initialize the database
+        clientRepository.saveAndFlush(client);
+        BagOfPoint bagOfPoint;
+        if (TestUtil.findAll(em, BagOfPoint.class).isEmpty()) {
+            bagOfPoint = BagOfPointResourceIT.createEntity(em);
+            em.persist(bagOfPoint);
+            em.flush();
+        } else {
+            bagOfPoint = TestUtil.findAll(em, BagOfPoint.class).get(0);
+        }
+        em.persist(bagOfPoint);
+        em.flush();
+        client.addBagOfPoint(bagOfPoint);
+        clientRepository.saveAndFlush(client);
+        Long bagOfPointId = bagOfPoint.getId();
+
+        // Get all the clientList where bagOfPoint equals to bagOfPointId
+        defaultClientShouldBeFound("bagOfPointId.equals=" + bagOfPointId);
+
+        // Get all the clientList where bagOfPoint equals to (bagOfPointId + 1)
+        defaultClientShouldNotBeFound("bagOfPointId.equals=" + (bagOfPointId + 1));
+    }
+
+    @Test
+    @Transactional
+    void getAllClientsByPointUseIsEqualToSomething() throws Exception {
+        // Initialize the database
+        clientRepository.saveAndFlush(client);
+        PointUse pointUse;
+        if (TestUtil.findAll(em, PointUse.class).isEmpty()) {
+            pointUse = PointUseResourceIT.createEntity(em);
+            em.persist(pointUse);
+            em.flush();
+        } else {
+            pointUse = TestUtil.findAll(em, PointUse.class).get(0);
+        }
+        em.persist(pointUse);
+        em.flush();
+        client.addPointUse(pointUse);
+        clientRepository.saveAndFlush(client);
+        Long pointUseId = pointUse.getId();
+
+        // Get all the clientList where pointUse equals to pointUseId
+        defaultClientShouldBeFound("pointUseId.equals=" + pointUseId);
+
+        // Get all the clientList where pointUse equals to (pointUseId + 1)
+        defaultClientShouldNotBeFound("pointUseId.equals=" + (pointUseId + 1));
+    }
+
+    @Test
+    @Transactional
     void getAllClientsByDocumentTypeIsEqualToSomething() throws Exception {
         // Initialize the database
         clientRepository.saveAndFlush(client);
@@ -800,32 +853,6 @@ class ClientResourceIT {
 
         // Get all the clientList where nacionality equals to (nacionalityId + 1)
         defaultClientShouldNotBeFound("nacionalityId.equals=" + (nacionalityId + 1));
-    }
-
-    @Test
-    @Transactional
-    void getAllClientsByBagOfPointIsEqualToSomething() throws Exception {
-        // Initialize the database
-        clientRepository.saveAndFlush(client);
-        BagOfPoint bagOfPoint;
-        if (TestUtil.findAll(em, BagOfPoint.class).isEmpty()) {
-            bagOfPoint = BagOfPointResourceIT.createEntity(em);
-            em.persist(bagOfPoint);
-            em.flush();
-        } else {
-            bagOfPoint = TestUtil.findAll(em, BagOfPoint.class).get(0);
-        }
-        em.persist(bagOfPoint);
-        em.flush();
-        client.setBagOfPoint(bagOfPoint);
-        clientRepository.saveAndFlush(client);
-        Long bagOfPointId = bagOfPoint.getId();
-
-        // Get all the clientList where bagOfPoint equals to bagOfPointId
-        defaultClientShouldBeFound("bagOfPointId.equals=" + bagOfPointId);
-
-        // Get all the clientList where bagOfPoint equals to (bagOfPointId + 1)
-        defaultClientShouldNotBeFound("bagOfPointId.equals=" + (bagOfPointId + 1));
     }
 
     /**

@@ -32,6 +32,12 @@
             <column name="operation_amount" type="${floatType}">
                 <constraints nullable="false" />
             </column>
+            <column name="state" type="varchar(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="client_id" type="bigint">
+                <constraints nullable="true" />
+            </column>
             <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
         </createTable>
         <dropDefaultValue tableName="bag_of_point" columnName="asignation_date" columnDataType="${datetimeType}"/>
@@ -61,6 +67,7 @@
             <column name="score_used" type="numeric"/>
             <column name="score_balance" type="numeric"/>
             <column name="operation_amount" type="numeric"/>
+            <column name="state" type="string"/>
             <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here -->
         </loadData>
     </changeSet>

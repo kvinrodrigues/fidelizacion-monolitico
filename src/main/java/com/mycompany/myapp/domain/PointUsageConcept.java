@@ -28,7 +28,7 @@ public class PointUsageConcept implements Serializable {
     private Long requiredPoints;
 
     @OneToMany(mappedBy = "pointUsageConcept")
-    @JsonIgnoreProperties(value = { "client", "pointUseDetails", "pointUsageConcept" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "pointUseDetails", "client", "pointUsageConcept" }, allowSetters = true)
     private Set<PointUse> pointUses = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

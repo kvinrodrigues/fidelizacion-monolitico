@@ -40,7 +40,8 @@ entity BagOfPoint {
     assignedScore Long required,
     scoreUsed Long required,
     scoreBalance Long required,
-    operationAmount Float required
+    operationAmount Float required,
+    state String required
 }
 
 entity PointUse {
@@ -61,11 +62,11 @@ relationship OneToMany {
 }
 
 relationship OneToMany {
-	BagOfPoint{client} to Client
+	Client{bagOfPoint} to BagOfPoint
 }
 
-relationship OneToOne {
-	PointUse{client} to Client
+relationship OneToMany {
+	Client{pointUse} to PointUse
 }
 
 relationship OneToMany {

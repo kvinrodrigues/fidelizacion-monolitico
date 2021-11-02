@@ -14,8 +14,6 @@ import { IDocumentType } from 'app/entities/document-type/document-type.model';
 import { DocumentTypeService } from 'app/entities/document-type/service/document-type.service';
 import { INacionality } from 'app/entities/nacionality/nacionality.model';
 import { NacionalityService } from 'app/entities/nacionality/service/nacionality.service';
-import { IBagOfPoint } from 'app/entities/bag-of-point/bag-of-point.model';
-import { BagOfPointService } from 'app/entities/bag-of-point/service/bag-of-point.service';
 
 @Component({
   selector: 'jhi-client-update',
@@ -26,7 +24,6 @@ export class ClientUpdateComponent implements OnInit {
 
   documentTypesSharedCollection: IDocumentType[] = [];
   nacionalitiesSharedCollection: INacionality[] = [];
-  bagOfPointsSharedCollection: IBagOfPoint[] = [];
 
   editForm = this.fb.group({
     id: [],
@@ -38,14 +35,12 @@ export class ClientUpdateComponent implements OnInit {
     birthDate: [null, [Validators.required]],
     documentType: [],
     nacionality: [],
-    bagOfPoint: [],
   });
 
   constructor(
     protected clientService: ClientService,
     protected documentTypeService: DocumentTypeService,
     protected nacionalityService: NacionalityService,
-    protected bagOfPointService: BagOfPointService,
     protected activatedRoute: ActivatedRoute,
     protected fb: FormBuilder
   ) {}
@@ -85,10 +80,6 @@ export class ClientUpdateComponent implements OnInit {
     return item.id!;
   }
 
-  trackBagOfPointById(index: number, item: IBagOfPoint): number {
-    return item.id!;
-  }
-
   protected subscribeToSaveResponse(result: Observable<HttpResponse<IClient>>): void {
     result.pipe(finalize(() => this.onSaveFinalize())).subscribe(
       () => this.onSaveSuccess(),
@@ -119,7 +110,6 @@ export class ClientUpdateComponent implements OnInit {
       birthDate: client.birthDate ? client.birthDate.format(DATE_TIME_FORMAT) : null,
       documentType: client.documentType,
       nacionality: client.nacionality,
-      bagOfPoint: client.bagOfPoint,
     });
 
     this.documentTypesSharedCollection = this.documentTypeService.addDocumentTypeToCollectionIfMissing(
@@ -129,10 +119,6 @@ export class ClientUpdateComponent implements OnInit {
     this.nacionalitiesSharedCollection = this.nacionalityService.addNacionalityToCollectionIfMissing(
       this.nacionalitiesSharedCollection,
       client.nacionality
-    );
-    this.bagOfPointsSharedCollection = this.bagOfPointService.addBagOfPointToCollectionIfMissing(
-      this.bagOfPointsSharedCollection,
-      client.bagOfPoint
     );
   }
 
@@ -156,16 +142,6 @@ export class ClientUpdateComponent implements OnInit {
         )
       )
       .subscribe((nacionalities: INacionality[]) => (this.nacionalitiesSharedCollection = nacionalities));
-
-    this.bagOfPointService
-      .query()
-      .pipe(map((res: HttpResponse<IBagOfPoint[]>) => res.body ?? []))
-      .pipe(
-        map((bagOfPoints: IBagOfPoint[]) =>
-          this.bagOfPointService.addBagOfPointToCollectionIfMissing(bagOfPoints, this.editForm.get('bagOfPoint')!.value)
-        )
-      )
-      .subscribe((bagOfPoints: IBagOfPoint[]) => (this.bagOfPointsSharedCollection = bagOfPoints));
   }
 
   protected createFromForm(): IClient {
@@ -180,7 +156,6 @@ export class ClientUpdateComponent implements OnInit {
       birthDate: this.editForm.get(['birthDate'])!.value ? dayjs(this.editForm.get(['birthDate'])!.value, DATE_TIME_FORMAT) : undefined,
       documentType: this.editForm.get(['documentType'])!.value,
       nacionality: this.editForm.get(['nacionality'])!.value,
-      bagOfPoint: this.editForm.get(['bagOfPoint'])!.value,
     };
   }
 }

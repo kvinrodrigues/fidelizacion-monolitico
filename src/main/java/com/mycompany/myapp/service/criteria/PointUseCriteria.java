@@ -31,9 +31,9 @@ public class PointUseCriteria implements Serializable, Criteria {
 
     private InstantFilter eventDate;
 
-    private LongFilter clientId;
-
     private LongFilter pointUseDetailId;
+
+    private LongFilter clientId;
 
     private LongFilter pointUsageConceptId;
 
@@ -45,8 +45,8 @@ public class PointUseCriteria implements Serializable, Criteria {
         this.id = other.id == null ? null : other.id.copy();
         this.scoreUsed = other.scoreUsed == null ? null : other.scoreUsed.copy();
         this.eventDate = other.eventDate == null ? null : other.eventDate.copy();
-        this.clientId = other.clientId == null ? null : other.clientId.copy();
         this.pointUseDetailId = other.pointUseDetailId == null ? null : other.pointUseDetailId.copy();
+        this.clientId = other.clientId == null ? null : other.clientId.copy();
         this.pointUsageConceptId = other.pointUsageConceptId == null ? null : other.pointUsageConceptId.copy();
         this.distinct = other.distinct;
     }
@@ -101,21 +101,6 @@ public class PointUseCriteria implements Serializable, Criteria {
         this.eventDate = eventDate;
     }
 
-    public LongFilter getClientId() {
-        return clientId;
-    }
-
-    public LongFilter clientId() {
-        if (clientId == null) {
-            clientId = new LongFilter();
-        }
-        return clientId;
-    }
-
-    public void setClientId(LongFilter clientId) {
-        this.clientId = clientId;
-    }
-
     public LongFilter getPointUseDetailId() {
         return pointUseDetailId;
     }
@@ -129,6 +114,21 @@ public class PointUseCriteria implements Serializable, Criteria {
 
     public void setPointUseDetailId(LongFilter pointUseDetailId) {
         this.pointUseDetailId = pointUseDetailId;
+    }
+
+    public LongFilter getClientId() {
+        return clientId;
+    }
+
+    public LongFilter clientId() {
+        if (clientId == null) {
+            clientId = new LongFilter();
+        }
+        return clientId;
+    }
+
+    public void setClientId(LongFilter clientId) {
+        this.clientId = clientId;
     }
 
     public LongFilter getPointUsageConceptId() {
@@ -167,8 +167,8 @@ public class PointUseCriteria implements Serializable, Criteria {
             Objects.equals(id, that.id) &&
             Objects.equals(scoreUsed, that.scoreUsed) &&
             Objects.equals(eventDate, that.eventDate) &&
-            Objects.equals(clientId, that.clientId) &&
             Objects.equals(pointUseDetailId, that.pointUseDetailId) &&
+            Objects.equals(clientId, that.clientId) &&
             Objects.equals(pointUsageConceptId, that.pointUsageConceptId) &&
             Objects.equals(distinct, that.distinct)
         );
@@ -176,7 +176,7 @@ public class PointUseCriteria implements Serializable, Criteria {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, scoreUsed, eventDate, clientId, pointUseDetailId, pointUsageConceptId, distinct);
+        return Objects.hash(id, scoreUsed, eventDate, pointUseDetailId, clientId, pointUsageConceptId, distinct);
     }
 
     // prettier-ignore
@@ -186,8 +186,8 @@ public class PointUseCriteria implements Serializable, Criteria {
             (id != null ? "id=" + id + ", " : "") +
             (scoreUsed != null ? "scoreUsed=" + scoreUsed + ", " : "") +
             (eventDate != null ? "eventDate=" + eventDate + ", " : "") +
-            (clientId != null ? "clientId=" + clientId + ", " : "") +
             (pointUseDetailId != null ? "pointUseDetailId=" + pointUseDetailId + ", " : "") +
+            (clientId != null ? "clientId=" + clientId + ", " : "") +
             (pointUsageConceptId != null ? "pointUsageConceptId=" + pointUsageConceptId + ", " : "") +
             (distinct != null ? "distinct=" + distinct + ", " : "") +
             "}";
