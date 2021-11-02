@@ -78,7 +78,7 @@ public class BagOfPointResource {
      * @param bagOfPoint the bagOfPoint to update.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated bagOfPoint,
      * or with status {@code 400 (Bad Request)} if the bagOfPoint is not valid,
-     * or with status {@code 500 (Internal Server Error)} if the bagOfPoint couldn't be updated.
+     * or with status {@code 500 (Internal Server ErrorbagOfPointQueryService)} if the bagOfPoint couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/bag-of-points/{id}")
