@@ -91,4 +91,6 @@ public class PointUseService {
         log.debug("Request to delete PointUse : {}", id);
         pointUseRepository.deleteById(id);
     }
+
+
 }

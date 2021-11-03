@@ -1,17 +1,26 @@
 package com.mycompany.myapp.service;
 
+import com.mycompany.myapp.domain.BagOfPoint;
+import com.mycompany.myapp.domain.Client;
 import com.mycompany.myapp.domain.PointAllocationRule;
+
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
+
 import org.springframework.stereotype.Service;
 
 @Service
 public class PointAssignationService {
 
     private final PointAllocationRuleService pointAllocationRuleService;
+    private final BagOfPointService bagOfPointService;
 
-    public PointAssignationService(PointAllocationRuleService pointAllocationRuleService) {
+    public PointAssignationService(PointAllocationRuleService pointAllocationRuleService, BagOfPointService bagOfPointService) {
         this.pointAllocationRuleService = pointAllocationRuleService;
+        this.bagOfPointService = bagOfPointService;
     }
+
 
     //  consultar cuantos puntos equivale a un monto X (GET):es un servicio
     // informativo que devuelve la cantidad de puntos equivalente al monto proporcionado
@@ -37,4 +46,19 @@ public class PointAssignationService {
     // - carga de puntos (POST):se recibe el identificador de cliente y el monto de la
     // operación, y se asigna los puntos (genera datos con la estructura del punto 5)
     // TODO
+    public BagOfPoint pointAssignation(Long identificador, Float monto) {
+        long amount = getAmountPointsFrom(monto);
+        BagOfPoint bagOfPoint = new BagOfPoint()
+            .operationAmount(monto)
+            .client(new Client().id(identificador))
+            .assignedScore(amount)
+            .scoreUsed(0L)
+            .scoreBalance(amount)
+            .state("active")
+            .asignationDate(Instant.now())
+            .expirationDate(Instant.now().plus(30, ChronoUnit.DAYS));
+        return bagOfPointService.save(bagOfPoint);
+
+    }
+
 }
