@@ -1,13 +1,4 @@
-PROYECTO
-
 ## Electiva 3: ARQ-WEB
-
-## Trabajo Práctico: Primer Parcial
-
-```
-Prof.: JOSÉ RODRIGO BENITEZ P. rbenitez@pol.una.py
-07 - 09 - 2021
-```
 
 Este Trabajo involucra la implementación del Front-End (@primer*parcial) de y Back-end (@segundo*
 parcial), un sistema informático que será
@@ -82,7 +73,7 @@ Estructura: id autogenerado, descripción de concepto, puntos requeridos.
   o 200.000 Gs. a 499.999 Gs. 1 punto cada 30.
   o 500.000 Gs. para arriba: 1 punto cada 20.
 
-Observación: TODO VERIFICAR, los rangos serán opcionales, es decir, se puede tener una sola regla que
+Observación: VERIFICAR, los rangos serán opcionales, es decir, se puede tener una sola regla que
 asigne 1 punto cada X Gs. sin importar en qué rango cae el monto de la operación.
 Estructura: id autogenerado, limite inferior, límite superior, monto de equivalencia de 1
 punto
@@ -102,7 +93,7 @@ Estructura: id autogenerado, identificador del cliente, fecha de asignación de 
 fecha de caducidad de puntaje, puntaje asignado, puntaje utilizado, saldo de puntos,
 monto de la operación
 
-6. TODO VERIFICAR Uso de puntos
+6. VERIFICAR Uso de puntos
    Debe utilizarse en un esquema FIFO (primero se utilizan las bolsas más antiguas). Tiene
    un detalle debido a que para satisfacer una petición de puntos se puede utilizar más de
    una bolsa.
@@ -114,7 +105,7 @@ Estructura:
 - Detalle: id autogenerado, identificador de la cabecera, puntaje utilizado, identificador
   de la bolsa de puntos utilizada
 
-7. TODO VERIFICAR - Se puede usar 'jpaMetamodelFiltering' Consultas (GET)
+7. Consultas (GET)
 
 Este módulo contempla la consulta para el desarrollo de reportes.
 Las consultas a proveer son:
@@ -125,7 +116,7 @@ Las consultas a proveer son:
 - consulta de clientes por: nombre (aproximación), apellido (aproximación),
   Cumpleaños
 
-8. TODO Servicios
+8. Servicios
 
 - carga de puntos (POST):se recibe el identificador de cliente y el monto de la
   operación, y se asigna los puntos (genera datos con la estructura del punto 5)
@@ -137,7 +128,7 @@ Las consultas a proveer son:
   informativo que devuelve la cantidad de puntos equivalente al monto proporcionado
   como parámetro utilizando la configuración del punto 3
 
-9. TODO Proceso planificado cada x horas
+9. Proceso planificado cada x horas
 
 Proceso que pueda planificarse que corra cada X horas y actualice el estado de
 las bolsas con puntos vencidos.

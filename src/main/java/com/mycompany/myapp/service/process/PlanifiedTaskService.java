@@ -25,7 +25,7 @@ public class PlanifiedTaskService {
 
     // Proceso que pueda planificarse que corra cada X horas y actualice el estado de
     // las bolsas con puntos vencidos.
-    @Scheduled(fixedRate = 60000)
+    @Scheduled(fixedRateString = "${spring.application.task.delay.time}", initialDelay = 10000)
     public void scheduleFixedRateTask() {
         log.debug("Running planified process...");
 
