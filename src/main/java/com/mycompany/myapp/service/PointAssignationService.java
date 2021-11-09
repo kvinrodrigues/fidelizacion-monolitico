@@ -6,6 +6,7 @@ import com.mycompany.myapp.web.rest.dto.UseOfPointsDto;
 import com.mycompany.myapp.web.rest.errors.BadRequestAlertException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ import tech.jhipster.service.filter.StringFilter;
 public class PointAssignationService {
 
     private final PointAllocationRuleService pointAllocationRuleService;
+    private final ExpirationPointService expirationPointService;
     private final BagOfPointService bagOfPointService;
     private final BagOfPointQueryService bagOfPointQueryService;
     private final PointUseService pointUseService;
@@ -27,6 +29,7 @@ public class PointAssignationService {
 
     public PointAssignationService(
         PointAllocationRuleService pointAllocationRuleService,
+        ExpirationPointService expirationPointService,
         BagOfPointService bagOfPointService,
         BagOfPointQueryService bagOfPointQueryService,
         PointUseService pointUseService,
@@ -34,6 +37,7 @@ public class PointAssignationService {
         PointUsageConceptService pointUsageConceptService
     ) {
         this.pointAllocationRuleService = pointAllocationRuleService;
+        this.expirationPointService = expirationPointService;
         this.bagOfPointService = bagOfPointService;
         this.bagOfPointQueryService = bagOfPointQueryService;
         this.pointUseService = pointUseService;
@@ -63,6 +67,15 @@ public class PointAssignationService {
         long amount = getAmountPointsFrom(ammount);
         final String initialState = "ACTIVE";
 
+        Instant now = Instant.now();
+        Instant expirationDate = expirationPointService
+            .findAll()
+            .stream()
+            .filter(value -> now.isAfter(value.getValidityStartDate()) && now.isBefore(value.getValidityEndDate()))
+            .findFirst()
+            .map(value -> now.plus(value.getScoreDurationDays(), ChronoUnit.DAYS))
+            .orElse(now.plus(30, ChronoUnit.DAYS));
+
         BagOfPoint bagOfPoint = new BagOfPoint()
             .operationAmount(ammount)
             .client(new Client().id(clientId))
@@ -71,7 +84,7 @@ public class PointAssignationService {
             .scoreBalance(amount)
             .state(initialState)
             .asignationDate(Instant.now())
-            .expirationDate(Instant.now().plus(30, ChronoUnit.DAYS));
+            .expirationDate(expirationDate);
         return bagOfPointService.save(bagOfPoint);
     }
 
@@ -85,15 +98,17 @@ public class PointAssignationService {
             .orElseThrow(() -> new BadRequestAlertException("Entity not found", "PointUsage", "idnotfound"));
 
         Long scoreToUse = pointUsageConcept.getRequiredPoints();
-        BagOfPoint bagOfPoint = getAvailableBagOfPointFrom(useOfPointsDto);
+        BagOfPoint bagOfPoint = getAvailableBagOfPointFrom(useOfPointsDto, pointUsageConcept.getRequiredPoints());
+        updateBagOfPoint(bagOfPoint, scoreToUse);
 
         PointUse pointUse = generatePointUse(useOfPointsDto, pointUsageConcept, scoreToUse);
-        generatePointUseDetail(bagOfPoint, scoreToUse, pointUse);
+        PointUseDet pointUseDet = generatePointUseDetail(bagOfPoint, scoreToUse, pointUse);
 
+        pointUse.setPointUseDetails(Collections.singleton(pointUseDet));
         return pointUse;
     }
 
-    private BagOfPoint getAvailableBagOfPointFrom(UseOfPointsDto useOfPointsDto) {
+    private BagOfPoint getAvailableBagOfPointFrom(UseOfPointsDto useOfPointsDto, Long requiredScore) {
         BagOfPointCriteria bagOfPointCriteria = new BagOfPointCriteria();
 
         bagOfPointCriteria.setState(new StringFilter().setContains("ACTIVE"));
@@ -101,6 +116,10 @@ public class PointAssignationService {
         clientFilter.setEquals(useOfPointsDto.getClientId());
         bagOfPointCriteria.setClientId(clientFilter);
         bagOfPointCriteria.setExpirationDate(new InstantFilter().setGreaterThan(Instant.now()));
+        LongFilter scoreFilter = new LongFilter();
+        scoreFilter.setGreaterThanOrEqual(requiredScore);
+
+        bagOfPointCriteria.setScoreBalance(scoreFilter);
 
         return bagOfPointQueryService
             .findByCriteria(bagOfPointCriteria)
@@ -109,10 +128,19 @@ public class PointAssignationService {
             .orElseThrow(() -> new NullPointerException("Cannot found an available bagOfPoint"));
     }
 
-    private void generatePointUseDetail(BagOfPoint bagOfPoint, Long scoreToUse, PointUse pointUse) {
+    private void updateBagOfPoint(BagOfPoint bagOfPoint, Long scoreToUse) {
+        Long scoreUsed = bagOfPoint.getScoreUsed();
+        Long currentBalance = bagOfPoint.getScoreBalance();
+
+        bagOfPoint.setScoreUsed(scoreUsed + scoreToUse);
+        bagOfPoint.setScoreBalance(currentBalance - scoreToUse);
+        bagOfPointService.save(bagOfPoint);
+    }
+
+    private PointUseDet generatePointUseDetail(BagOfPoint bagOfPoint, Long scoreToUse, PointUse pointUse) {
         PointUseDet pointUseDet = new PointUseDet().pointUse(pointUse).scoreUsed(scoreToUse).bagOfPoint(bagOfPoint);
 
-        pointUseDetService.save(pointUseDet);
+        return pointUseDetService.save(pointUseDet);
     }
 
     private PointUse generatePointUse(UseOfPointsDto useOfPointsDto, PointUsageConcept pointUsageConcept, Long scoreToUse) {
@@ -121,7 +149,7 @@ public class PointAssignationService {
             .scoreUsed(scoreToUse)
             .eventDate(Instant.now())
             .client(new Client().id(useOfPointsDto.getClientId()));
-        pointUseService.save(pointUse);
-        return pointUse;
+
+        return pointUseService.save(pointUse);
     }
 }

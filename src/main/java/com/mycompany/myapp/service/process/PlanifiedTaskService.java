@@ -32,8 +32,11 @@ public class PlanifiedTaskService {
         final List<BagOfPoint> modifiedExpiredBagOfPoints = bagOfPointService
             .findAll()
             .stream()
-            .filter(bagOfPoints -> bagOfPoints.getExpirationDate().isAfter(Instant.now()))
-            .map(value -> value.assignedScore(0L))
+            .filter(bagOfPoints -> Instant.now().isAfter(bagOfPoints.getExpirationDate()))
+            .peek(value -> {
+                value.assignedScore(0L);
+                value.setScoreBalance(0L);
+            })
             .collect(Collectors.toList());
 
         final List<BagOfPoint> updatedExpiredBagOfPoints = bagOfPointService.saveAll(modifiedExpiredBagOfPoints);
