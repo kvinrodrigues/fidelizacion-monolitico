@@ -28,14 +28,17 @@ public class PlanifiedTaskService {
     @Scheduled(fixedRateString = "${spring.application.task.delay.time}", initialDelay = 10000)
     public void scheduleFixedRateTask() {
         log.debug("Running planified process...");
+        String expiredState = "EXPIRED";
 
         final List<BagOfPoint> modifiedExpiredBagOfPoints = bagOfPointService
             .findAll()
             .stream()
-            .filter(bagOfPoints -> Instant.now().isAfter(bagOfPoints.getExpirationDate()))
-            .peek(value -> {
-                value.assignedScore(0L);
+            .filter(bagOfPoints -> (Instant.now().isAfter(bagOfPoints.getExpirationDate())))
+            .filter(bagOfPoints -> !(expiredState.equals(bagOfPoints.getState())))
+            .map(value -> {
                 value.setScoreBalance(0L);
+                value.setState(expiredState);
+                return value;
             })
             .collect(Collectors.toList());
 

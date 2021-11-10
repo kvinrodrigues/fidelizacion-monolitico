@@ -26,6 +26,7 @@ public class PointAssignationService {
     private final PointUseService pointUseService;
     private final PointUseDetService pointUseDetService;
     private final PointUsageConceptService pointUsageConceptService;
+    private final ClientService clientService;
 
     public PointAssignationService(
         PointAllocationRuleService pointAllocationRuleService,
@@ -34,8 +35,8 @@ public class PointAssignationService {
         BagOfPointQueryService bagOfPointQueryService,
         PointUseService pointUseService,
         PointUseDetService pointUseDetService,
-        PointUsageConceptService pointUsageConceptService
-    ) {
+        PointUsageConceptService pointUsageConceptService,
+        ClientService clientService) {
         this.pointAllocationRuleService = pointAllocationRuleService;
         this.expirationPointService = expirationPointService;
         this.bagOfPointService = bagOfPointService;
@@ -43,6 +44,7 @@ public class PointAssignationService {
         this.pointUseService = pointUseService;
         this.pointUseDetService = pointUseDetService;
         this.pointUsageConceptService = pointUsageConceptService;
+        this.clientService = clientService;
     }
 
     //  consultar cuantos puntos equivale a un monto X (GET):es un servicio
@@ -65,6 +67,8 @@ public class PointAssignationService {
     // operación, y se asigna los puntos (genera datos con la estructura del punto 5)
     public BagOfPoint assign(Long clientId, Float ammount) {
         long amount = getAmountPointsFrom(ammount);
+        Client client = clientService.findOne(clientId)
+            .orElseThrow(() -> new BadRequestAlertException("Entity not found", "client", "idnotfound"));
         final String initialState = "ACTIVE";
 
         Instant now = Instant.now();
@@ -78,7 +82,7 @@ public class PointAssignationService {
 
         BagOfPoint bagOfPoint = new BagOfPoint()
             .operationAmount(ammount)
-            .client(new Client().id(clientId))
+            .client(client)
             .assignedScore(amount)
             .scoreUsed(0L)
             .scoreBalance(amount)
@@ -96,6 +100,9 @@ public class PointAssignationService {
         PointUsageConcept pointUsageConcept = pointUsageConceptService
             .findOne(useOfPointsDto.getUsageConceptId())
             .orElseThrow(() -> new BadRequestAlertException("Entity not found", "PointUsage", "idnotfound"));
+
+        clientService.findOne(useOfPointsDto.getClientId())
+            .orElseThrow(() -> new BadRequestAlertException("Entity not found", "client", "idnotfound"));
 
         Long scoreToUse = pointUsageConcept.getRequiredPoints();
         BagOfPoint bagOfPoint = getAvailableBagOfPointFrom(useOfPointsDto, pointUsageConcept.getRequiredPoints());
