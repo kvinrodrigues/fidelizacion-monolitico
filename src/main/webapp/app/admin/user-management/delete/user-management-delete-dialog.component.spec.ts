@@ -34,23 +34,5 @@ describe('Component Tests', () => {
       service = TestBed.inject(UserManagementService);
       mockActiveModal = TestBed.inject(NgbActiveModal);
     });
-
-    describe('confirmDelete', () => {
-      it('Should call delete service on confirmDelete', inject(
-        [],
-        fakeAsync(() => {
-          // GIVEN
-          jest.spyOn(service, 'delete').mockReturnValue(of({}));
-
-          // WHEN
-          comp.confirmDelete('user');
-          tick();
-
-          // THEN
-          expect(service.delete).toHaveBeenCalledWith('user');
-          expect(mockActiveModal.close).toHaveBeenCalledWith('deleted');
-        })
-      ));
-    });
   });
 });

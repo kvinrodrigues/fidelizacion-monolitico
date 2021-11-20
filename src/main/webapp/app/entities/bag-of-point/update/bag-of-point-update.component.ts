@@ -24,14 +24,14 @@ export class BagOfPointUpdateComponent implements OnInit {
 
   editForm = this.fb.group({
     id: [],
-    asignationDate: [null, [Validators.required]],
-    expirationDate: [null, [Validators.required]],
-    assignedScore: [null, [Validators.required]],
-    scoreUsed: [null, [Validators.required]],
-    scoreBalance: [null, [Validators.required]],
+    asignationDate: [null],
+    expirationDate: [null],
+    assignedScore: [null],
+    scoreUsed: [null],
+    scoreBalance: [null],
     operationAmount: [null, [Validators.required]],
-    state: [null, [Validators.required]],
-    client: [],
+    state: [null],
+    client: [null, [Validators.required]],
   });
 
   constructor(
@@ -62,11 +62,7 @@ export class BagOfPointUpdateComponent implements OnInit {
   save(): void {
     this.isSaving = true;
     const bagOfPoint = this.createFromForm();
-    if (bagOfPoint.id !== undefined) {
-      this.subscribeToSaveResponse(this.bagOfPointService.update(bagOfPoint));
-    } else {
-      this.subscribeToSaveResponse(this.bagOfPointService.create(bagOfPoint));
-    }
+    this.subscribeToSaveResponse(this.bagOfPointService.create(bagOfPoint));
   }
 
   trackClientById(index: number, item: IClient): number {
@@ -119,18 +115,7 @@ export class BagOfPointUpdateComponent implements OnInit {
   protected createFromForm(): IBagOfPoint {
     return {
       ...new BagOfPoint(),
-      id: this.editForm.get(['id'])!.value,
-      asignationDate: this.editForm.get(['asignationDate'])!.value
-        ? dayjs(this.editForm.get(['asignationDate'])!.value, DATE_TIME_FORMAT)
-        : undefined,
-      expirationDate: this.editForm.get(['expirationDate'])!.value
-        ? dayjs(this.editForm.get(['expirationDate'])!.value, DATE_TIME_FORMAT)
-        : undefined,
-      assignedScore: this.editForm.get(['assignedScore'])!.value,
-      scoreUsed: this.editForm.get(['scoreUsed'])!.value,
-      scoreBalance: this.editForm.get(['scoreBalance'])!.value,
       operationAmount: this.editForm.get(['operationAmount'])!.value,
-      state: this.editForm.get(['state'])!.value,
       client: this.editForm.get(['client'])!.value,
     };
   }

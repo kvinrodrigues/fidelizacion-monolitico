@@ -3,7 +3,7 @@ package com.mycompany.myapp.web.rest;
 import com.mycompany.myapp.domain.BagOfPoint;
 import com.mycompany.myapp.domain.PointUse;
 import com.mycompany.myapp.service.PointAssignationService;
-import com.mycompany.myapp.web.rest.dto.BackOfPointDto;
+import com.mycompany.myapp.web.rest.dto.BagOfPointDto;
 import com.mycompany.myapp.web.rest.dto.UseOfPointsDto;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -33,10 +33,10 @@ public class PointAssignationResource {
     }
 
     @PostMapping("/points/assignation")
-    public ResponseEntity<BagOfPoint> createBagofPoint(@Valid @RequestBody BackOfPointDto backOfPointDto) throws URISyntaxException {
+    public ResponseEntity<BagOfPoint> createBagofPoint(@Valid @RequestBody BagOfPointDto backOfPointDto) throws URISyntaxException {
         log.debug("REST request to save bagofpoint : {}", backOfPointDto);
 
-        BagOfPoint result = pointAssignationService.assign(backOfPointDto.getClientId(), backOfPointDto.getAmount());
+        BagOfPoint result = pointAssignationService.assign(backOfPointDto.getClient().getId(), backOfPointDto.getOperationAmount());
         return ResponseEntity.created(new URI("/api/bag-of-points/" + result.getId())).body(result);
     }
 

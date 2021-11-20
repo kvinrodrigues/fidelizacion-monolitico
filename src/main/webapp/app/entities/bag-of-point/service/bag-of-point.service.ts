@@ -21,21 +21,7 @@ export class BagOfPointService {
   create(bagOfPoint: IBagOfPoint): Observable<EntityResponseType> {
     const copy = this.convertDateFromClient(bagOfPoint);
     return this.http
-      .post<IBagOfPoint>(this.resourceUrl, copy, { observe: 'response' })
-      .pipe(map((res: EntityResponseType) => this.convertDateFromServer(res)));
-  }
-
-  update(bagOfPoint: IBagOfPoint): Observable<EntityResponseType> {
-    const copy = this.convertDateFromClient(bagOfPoint);
-    return this.http
-      .put<IBagOfPoint>(`${this.resourceUrl}/${getBagOfPointIdentifier(bagOfPoint) as number}`, copy, { observe: 'response' })
-      .pipe(map((res: EntityResponseType) => this.convertDateFromServer(res)));
-  }
-
-  partialUpdate(bagOfPoint: IBagOfPoint): Observable<EntityResponseType> {
-    const copy = this.convertDateFromClient(bagOfPoint);
-    return this.http
-      .patch<IBagOfPoint>(`${this.resourceUrl}/${getBagOfPointIdentifier(bagOfPoint) as number}`, copy, { observe: 'response' })
+      .post<IBagOfPoint>('/api/points/assignation', copy, { observe: 'response' })
       .pipe(map((res: EntityResponseType) => this.convertDateFromServer(res)));
   }
 

@@ -12,109 +12,6 @@
         </div>
 
         <div class="form-group">
-          <label class="form-control-label" for="field_asignationDate">Asignation Date</label>
-          <div class="d-flex">
-            <input
-              id="field_asignationDate"
-              data-cy="asignationDate"
-              type="datetime-local"
-              class="form-control"
-              name="asignationDate"
-              formControlName="asignationDate"
-              placeholder="YYYY-MM-DD HH:mm"
-            />
-          </div>
-          <div
-            *ngIf="
-              editForm.get('asignationDate')!.invalid && (editForm.get('asignationDate')!.dirty || editForm.get('asignationDate')!.touched)
-            "
-          >
-            <small class="form-text text-danger" *ngIf="editForm.get('asignationDate')?.errors?.required"> This field is required. </small>
-            <small class="form-text text-danger" [hidden]="!editForm.get('asignationDate')?.errors?.ZonedDateTimelocal">
-              This field should be a date and time.
-            </small>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-control-label" for="field_expirationDate">Expiration Date</label>
-          <div class="d-flex">
-            <input
-              id="field_expirationDate"
-              data-cy="expirationDate"
-              type="datetime-local"
-              class="form-control"
-              name="expirationDate"
-              formControlName="expirationDate"
-              placeholder="YYYY-MM-DD HH:mm"
-            />
-          </div>
-          <div
-            *ngIf="
-              editForm.get('expirationDate')!.invalid && (editForm.get('expirationDate')!.dirty || editForm.get('expirationDate')!.touched)
-            "
-          >
-            <small class="form-text text-danger" *ngIf="editForm.get('expirationDate')?.errors?.required"> This field is required. </small>
-            <small class="form-text text-danger" [hidden]="!editForm.get('expirationDate')?.errors?.ZonedDateTimelocal">
-              This field should be a date and time.
-            </small>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-control-label" for="field_assignedScore">Assigned Score</label>
-          <input
-            type="number"
-            class="form-control"
-            name="assignedScore"
-            id="field_assignedScore"
-            data-cy="assignedScore"
-            formControlName="assignedScore"
-          />
-          <div
-            *ngIf="
-              editForm.get('assignedScore')!.invalid && (editForm.get('assignedScore')!.dirty || editForm.get('assignedScore')!.touched)
-            "
-          >
-            <small class="form-text text-danger" *ngIf="editForm.get('assignedScore')?.errors?.required"> This field is required. </small>
-            <small class="form-text text-danger" [hidden]="!editForm.get('assignedScore')?.errors?.number">
-              This field should be a number.
-            </small>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-control-label" for="field_scoreUsed">Score Used</label>
-          <input type="number" class="form-control" name="scoreUsed" id="field_scoreUsed" data-cy="scoreUsed" formControlName="scoreUsed" />
-          <div *ngIf="editForm.get('scoreUsed')!.invalid && (editForm.get('scoreUsed')!.dirty || editForm.get('scoreUsed')!.touched)">
-            <small class="form-text text-danger" *ngIf="editForm.get('scoreUsed')?.errors?.required"> This field is required. </small>
-            <small class="form-text text-danger" [hidden]="!editForm.get('scoreUsed')?.errors?.number">
-              This field should be a number.
-            </small>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-control-label" for="field_scoreBalance">Score Balance</label>
-          <input
-            type="number"
-            class="form-control"
-            name="scoreBalance"
-            id="field_scoreBalance"
-            data-cy="scoreBalance"
-            formControlName="scoreBalance"
-          />
-          <div
-            *ngIf="editForm.get('scoreBalance')!.invalid && (editForm.get('scoreBalance')!.dirty || editForm.get('scoreBalance')!.touched)"
-          >
-            <small class="form-text text-danger" *ngIf="editForm.get('scoreBalance')?.errors?.required"> This field is required. </small>
-            <small class="form-text text-danger" [hidden]="!editForm.get('scoreBalance')?.errors?.number">
-              This field should be a number.
-            </small>
-          </div>
-        </div>
-
-        <div class="form-group">
           <label class="form-control-label" for="field_operationAmount">Operation Amount</label>
           <input
             type="number"
@@ -138,22 +35,14 @@
         </div>
 
         <div class="form-group">
-          <label class="form-control-label" for="field_state">State</label>
-          <input type="text" class="form-control" name="state" id="field_state" data-cy="state" formControlName="state" />
-          <div *ngIf="editForm.get('state')!.invalid && (editForm.get('state')!.dirty || editForm.get('state')!.touched)">
-            <small class="form-text text-danger" *ngIf="editForm.get('state')?.errors?.required"> This field is required. </small>
-          </div>
-        </div>
-
-        <div class="form-group">
           <label class="form-control-label" for="field_client">Client</label>
-          <select class="form-control" id="field_client" data-cy="client" name="client" formControlName="client">
+          <select required class="form-control" id="field_client" data-cy="client" name="client" formControlName="client">
             <option [ngValue]="null"></option>
             <option
               [ngValue]="clientOption.id === editForm.get('client')!.value?.id ? editForm.get('client')!.value : clientOption"
               *ngFor="let clientOption of clientsSharedCollection; trackBy: trackClientById"
             >
-              {{ clientOption.id }}
+              {{ clientOption.name }}
             </option>
           </select>
         </div>
