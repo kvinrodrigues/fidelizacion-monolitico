@@ -27,10 +27,10 @@ export class PointUseUpdateComponent implements OnInit {
 
   editForm = this.fb.group({
     id: [],
-    scoreUsed: [null, [Validators.required]],
-    eventDate: [null, [Validators.required]],
-    client: [],
-    pointUsageConcept: [],
+    scoreUsed: [null],
+    eventDate: [null],
+    client: [null, [Validators.required]],
+    pointUsageConcept: [null, [Validators.required]],
   });
 
   constructor(
@@ -58,14 +58,10 @@ export class PointUseUpdateComponent implements OnInit {
     window.history.back();
   }
 
-  save(): void {
+  create(): void {
     this.isSaving = true;
     const pointUse = this.createFromForm();
-    if (pointUse.id !== undefined) {
-      this.subscribeToSaveResponse(this.pointUseService.update(pointUse));
-    } else {
-      this.subscribeToSaveResponse(this.pointUseService.create(pointUse));
-    }
+    this.subscribeToSaveResponse(this.pointUseService.create(pointUse));
   }
 
   trackClientById(index: number, item: IClient): number {
@@ -135,9 +131,6 @@ export class PointUseUpdateComponent implements OnInit {
   protected createFromForm(): IPointUse {
     return {
       ...new PointUse(),
-      id: this.editForm.get(['id'])!.value,
-      scoreUsed: this.editForm.get(['scoreUsed'])!.value,
-      eventDate: this.editForm.get(['eventDate'])!.value ? dayjs(this.editForm.get(['eventDate'])!.value, DATE_TIME_FORMAT) : undefined,
       client: this.editForm.get(['client'])!.value,
       pointUsageConcept: this.editForm.get(['pointUsageConcept'])!.value,
     };

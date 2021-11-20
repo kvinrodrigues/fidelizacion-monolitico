@@ -36,7 +36,8 @@ public class PointAssignationService {
         PointUseService pointUseService,
         PointUseDetService pointUseDetService,
         PointUsageConceptService pointUsageConceptService,
-        ClientService clientService) {
+        ClientService clientService
+    ) {
         this.pointAllocationRuleService = pointAllocationRuleService;
         this.expirationPointService = expirationPointService;
         this.bagOfPointService = bagOfPointService;
@@ -67,7 +68,8 @@ public class PointAssignationService {
     // operación, y se asigna los puntos (genera datos con la estructura del punto 5)
     public BagOfPoint assign(Long clientId, Float ammount) {
         long amount = getAmountPointsFrom(ammount);
-        Client client = clientService.findOne(clientId)
+        Client client = clientService
+            .findOne(clientId)
             .orElseThrow(() -> new BadRequestAlertException("Entity not found", "client", "idnotfound"));
         final String initialState = "ACTIVE";
 
@@ -98,10 +100,11 @@ public class PointAssignationService {
     // o además debe enviar un correo electrónico al cliente como comprobante
     public PointUse usePointsFrom(UseOfPointsDto useOfPointsDto) {
         PointUsageConcept pointUsageConcept = pointUsageConceptService
-            .findOne(useOfPointsDto.getUsageConceptId())
+            .findOne(useOfPointsDto.getPointUsageConcept().getId())
             .orElseThrow(() -> new BadRequestAlertException("Entity not found", "PointUsage", "idnotfound"));
 
-        clientService.findOne(useOfPointsDto.getClientId())
+        clientService
+            .findOne(useOfPointsDto.getClient().getId())
             .orElseThrow(() -> new BadRequestAlertException("Entity not found", "client", "idnotfound"));
 
         Long scoreToUse = pointUsageConcept.getRequiredPoints();
@@ -120,7 +123,7 @@ public class PointAssignationService {
 
         bagOfPointCriteria.setState(new StringFilter().setContains("ACTIVE"));
         LongFilter clientFilter = new LongFilter();
-        clientFilter.setEquals(useOfPointsDto.getClientId());
+        clientFilter.setEquals(useOfPointsDto.getClient().getId());
         bagOfPointCriteria.setClientId(clientFilter);
         bagOfPointCriteria.setExpirationDate(new InstantFilter().setGreaterThan(Instant.now()));
         LongFilter scoreFilter = new LongFilter();
@@ -155,7 +158,7 @@ public class PointAssignationService {
             .pointUsageConcept(pointUsageConcept)
             .scoreUsed(scoreToUse)
             .eventDate(Instant.now())
-            .client(new Client().id(useOfPointsDto.getClientId()));
+            .client(new Client().id(useOfPointsDto.getClient().getId()));
 
         return pointUseService.save(pointUse);
     }

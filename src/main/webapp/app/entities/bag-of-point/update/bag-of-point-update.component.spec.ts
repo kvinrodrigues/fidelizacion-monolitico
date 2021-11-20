@@ -83,7 +83,7 @@ describe('Component Tests', () => {
         comp.ngOnInit();
 
         // WHEN
-        comp.save();
+        comp.create();
         expect(comp.isSaving).toEqual(true);
         saveSubject.next(new HttpResponse({ body: bagOfPoint }));
         saveSubject.complete();
@@ -104,7 +104,7 @@ describe('Component Tests', () => {
         comp.ngOnInit();
 
         // WHEN
-        comp.save();
+        comp.create();
         expect(comp.isSaving).toEqual(true);
         saveSubject.next(new HttpResponse({ body: bagOfPoint }));
         saveSubject.complete();
@@ -125,7 +125,7 @@ describe('Component Tests', () => {
         comp.ngOnInit();
 
         // WHEN
-        comp.save();
+        comp.create();
         expect(comp.isSaving).toEqual(true);
         saveSubject.error('This is an error!');
 

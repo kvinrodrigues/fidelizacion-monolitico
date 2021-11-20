@@ -1,23 +1,31 @@
 package com.mycompany.myapp.web.rest.dto;
 
+import com.mycompany.myapp.domain.Client;
+import com.mycompany.myapp.domain.PointUsageConcept;
+
 public class UseOfPointsDto {
 
-    private Long clientId;
-    private Long usageConceptId;
+    private Client client;
+    private PointUsageConcept pointUsageConcept;
 
-    public Long getClientId() {
-        return clientId;
+    public Client getClient() {
+        return client;
     }
 
-    public void setClientId(Long clientId) {
-        this.clientId = clientId;
+    public void setClient(Client client) {
+        this.client = client;
     }
 
-    public Long getUsageConceptId() {
-        return usageConceptId;
+    public PointUsageConcept getPointUsageConcept() {
+        return pointUsageConcept;
     }
 
-    public void setUsageConceptId(Long usageConceptId) {
-        this.usageConceptId = usageConceptId;
+    public void setPointUsageConcept(PointUsageConcept pointUsageConcept) {
+        this.pointUsageConcept = pointUsageConcept;
+    }
+
+    @Override
+    public String toString() {
+        return "UseOfPointsDto{" + "client=" + client + ", pointUsageConcept=" + pointUsageConcept + '}';
     }
 }

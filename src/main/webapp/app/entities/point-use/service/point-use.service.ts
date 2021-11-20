@@ -21,7 +21,7 @@ export class PointUseService {
   create(pointUse: IPointUse): Observable<EntityResponseType> {
     const copy = this.convertDateFromClient(pointUse);
     return this.http
-      .post<IPointUse>(this.resourceUrl, copy, { observe: 'response' })
+      .post<IPointUse>('/api/points/use', copy, { observe: 'response' })
       .pipe(map((res: EntityResponseType) => this.convertDateFromServer(res)));
   }
 

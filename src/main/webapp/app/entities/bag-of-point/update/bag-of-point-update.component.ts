@@ -59,7 +59,7 @@ export class BagOfPointUpdateComponent implements OnInit {
     window.history.back();
   }
 
-  save(): void {
+  create(): void {
     this.isSaving = true;
     const bagOfPoint = this.createFromForm();
     this.subscribeToSaveResponse(this.bagOfPointService.create(bagOfPoint));

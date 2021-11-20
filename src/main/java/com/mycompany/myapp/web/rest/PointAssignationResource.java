@@ -41,7 +41,7 @@ public class PointAssignationResource {
     }
 
     @PostMapping("/points/use")
-    public ResponseEntity<PointUse> usePoints(@Valid UseOfPointsDto useOfPointsDto) throws URISyntaxException {
+    public ResponseEntity<PointUse> usePoints(@Valid @RequestBody UseOfPointsDto useOfPointsDto) throws URISyntaxException {
         PointUse result = pointAssignationService.usePointsFrom(useOfPointsDto);
 
         return ResponseEntity.created(new URI("/api/point-uses/" + result.getId())).body(result);
