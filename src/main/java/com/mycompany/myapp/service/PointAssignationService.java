@@ -134,7 +134,7 @@ public class PointAssignationService {
         return bagOfPointQueryService
             .findByCriteria(bagOfPointCriteria)
             .stream()
-            .max(Comparator.comparing(BagOfPoint::getAsignationDate))
+            .min(Comparator.comparing(BagOfPoint::getAsignationDate))
             .orElseThrow(() -> new NullPointerException("Cannot found an available bagOfPoint"));
     }
 
