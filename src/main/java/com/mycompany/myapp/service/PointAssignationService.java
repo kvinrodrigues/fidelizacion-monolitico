@@ -6,9 +6,8 @@ import com.mycompany.myapp.web.rest.dto.UseOfPointsDto;
 import com.mycompany.myapp.web.rest.errors.BadRequestAlertException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tech.jhipster.service.filter.InstantFilter;
@@ -99,6 +98,7 @@ public class PointAssignationService {
     // (genera datos con la estructura del punto 6 y actualiza la del punto 5)
     // o además debe enviar un correo electrónico al cliente como comprobante
     public PointUse usePointsFrom(UseOfPointsDto useOfPointsDto) {
+        // Validaciones
         PointUsageConcept pointUsageConcept = pointUsageConceptService
             .findOne(useOfPointsDto.getPointUsageConcept().getId())
             .orElseThrow(() -> new BadRequestAlertException("Entity not found", "PointUsage", "idnotfound"));
@@ -107,18 +107,52 @@ public class PointAssignationService {
             .findOne(useOfPointsDto.getClient().getId())
             .orElseThrow(() -> new BadRequestAlertException("Entity not found", "client", "idnotfound"));
 
+        // Declaracion de cantidad de puntos a utilizar
         Long scoreToUse = pointUsageConcept.getRequiredPoints();
-        BagOfPoint bagOfPoint = getAvailableBagOfPointFrom(useOfPointsDto, pointUsageConcept.getRequiredPoints());
-        updateBagOfPoint(bagOfPoint, scoreToUse);
+        // Se obtienen las bolsas de puntos disponibles que por lo menos tengan 1 punto disponible
+        List<BagOfPoint> bagOfPoints = getAvailableBagOfPointFrom(useOfPointsDto, pointUsageConcept.getRequiredPoints());
 
+        // En caso de que no es encuentre una bolsa de puntos es que se lanza una excepcion
+        if (bagOfPoints.isEmpty()) {
+            throw new NullPointerException("Cannot found an available bagOfPoints");
+        }
+
+        // Se registra la cantidad de puntos necesarios segun el concepto
+        Long requiredPoints = pointUsageConcept.getRequiredPoints();
+
+        // Se registra una nueva entrada de un uso de puntaje
         PointUse pointUse = generatePointUse(useOfPointsDto, pointUsageConcept, scoreToUse);
-        PointUseDet pointUseDet = generatePointUseDetail(bagOfPoint, scoreToUse, pointUse);
 
-        pointUse.setPointUseDetails(Collections.singleton(pointUseDet));
+        // Se recorren las bolsas de puntos disponibles para realizar la actualizacion de cantidad de puntos
+        for (BagOfPoint bagOfpoint : bagOfPoints) {
+            final Long scoreBalance = bagOfpoint.getScoreBalance();
+
+            if (requiredPoints > scoreBalance) {
+                bagOfpoint.incrementScoreUsed(scoreBalance);
+                bagOfpoint.setScoreBalance(0L);
+                requiredPoints -= scoreBalance;
+            } else {
+                Long resultScore = bagOfpoint.getScoreBalance() - requiredPoints;
+
+                bagOfpoint.incrementScoreUsed(requiredPoints);
+                bagOfpoint.setScoreBalance(resultScore);
+                requiredPoints -= scoreBalance;
+            }
+
+            PointUseDet pointUseDet = generatePointUseDetail(bagOfpoint, pointUse);
+            pointUse.setPointUseDetails(Collections.singleton(pointUseDet));
+
+            if (requiredPoints.equals(0L)) {
+                break;
+            }
+
+            updateBagOfPoint(bagOfpoint, scoreToUse);
+        }
+
         return pointUse;
     }
 
-    private BagOfPoint getAvailableBagOfPointFrom(UseOfPointsDto useOfPointsDto, Long requiredScore) {
+    private List<BagOfPoint> getAvailableBagOfPointFrom(UseOfPointsDto useOfPointsDto, Long requiredScore) {
         BagOfPointCriteria bagOfPointCriteria = new BagOfPointCriteria();
 
         bagOfPointCriteria.setState(new StringFilter().setContains("ACTIVE"));
@@ -127,15 +161,15 @@ public class PointAssignationService {
         bagOfPointCriteria.setClientId(clientFilter);
         bagOfPointCriteria.setExpirationDate(new InstantFilter().setGreaterThan(Instant.now()));
         LongFilter scoreFilter = new LongFilter();
-        scoreFilter.setGreaterThanOrEqual(requiredScore);
+        scoreFilter.setGreaterThan(0L);
 
         bagOfPointCriteria.setScoreBalance(scoreFilter);
 
         return bagOfPointQueryService
             .findByCriteria(bagOfPointCriteria)
             .stream()
-            .min(Comparator.comparing(BagOfPoint::getAsignationDate))
-            .orElseThrow(() -> new NullPointerException("Cannot found an available bagOfPoint"));
+            .sorted(Comparator.comparing(BagOfPoint::getAsignationDate))
+            .collect(Collectors.toList());
     }
 
     private void updateBagOfPoint(BagOfPoint bagOfPoint, Long scoreToUse) {
@@ -147,7 +181,8 @@ public class PointAssignationService {
         bagOfPointService.save(bagOfPoint);
     }
 
-    private PointUseDet generatePointUseDetail(BagOfPoint bagOfPoint, Long scoreToUse, PointUse pointUse) {
+    private PointUseDet generatePointUseDetail(BagOfPoint bagOfPoint, PointUse pointUse) {
+        Long scoreToUse = bagOfPoint.getScoreUsed();
         PointUseDet pointUseDet = new PointUseDet().pointUse(pointUse).scoreUsed(scoreToUse).bagOfPoint(bagOfPoint);
 
         return pointUseDetService.save(pointUseDet);

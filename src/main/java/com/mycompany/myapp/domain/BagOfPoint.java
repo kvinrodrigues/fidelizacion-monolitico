@@ -122,6 +122,11 @@ public class BagOfPoint implements Serializable {
         return this;
     }
 
+    public BagOfPoint incrementScoreUsed(Long newScoreUsed) {
+        this.setScoreUsed(this.getScoreUsed() + newScoreUsed);
+        return this;
+    }
+
     public void setScoreUsed(Long scoreUsed) {
         this.scoreUsed = scoreUsed;
     }
